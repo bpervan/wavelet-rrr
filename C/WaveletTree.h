@@ -3,6 +3,9 @@
 
 typedef enum {false, true} bool;
 
+#define MEMORY_SIZE 10000000
+#define DICTIONARY_SIZE 256
+
 typedef struct {
     char character;
     bool value;

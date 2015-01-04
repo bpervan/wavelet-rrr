@@ -1,4 +1,4 @@
-#include "WavletTree.h"
+#include "WaveletTree.h"
 
 RRRTable *global_table;
 
@@ -6,19 +6,31 @@ int main (int argc, char* argv[]) {
 
     FILE *inputFile = NULL;
     char* filename, *input;
-    int length = 0, block, superblock;
-    char c;
+    int length = 0, block, superblock, low, high;
+    char c, s_char;
     WaveletTree *tree = NULL;
 
     global_table = (RRRTable *)calloc (1, sizeof(RRRTable));
 
-    /*
-    if (argc != 2) {
-        printf ("Wrong number of parameters: WavletTree.exe filename expected\n");
+    if (argc != 5) {
+        printf ("Wrong number of parameters: WavletTree.exe filename char low_bound high_bound expected\n");
         return -1;
     }
-    */
-    filename = "input.txt";
+
+    filename = argv[1];
+    s_char = argv[2][0];
+    low = atoi(argv[3]);
+    high = atoi(argv[4]);
+
+    if (low >= high) {
+        printf ("Wrong boundaries!\n");
+        return -1;
+    }
+
+    if (low < 0) {
+        printf ("Lower boundary cannot be a negative number: %d\n", low);
+        return -1;
+    }
 
     inputFile = fopen(filename, "r");
 
@@ -27,11 +39,18 @@ int main (int argc, char* argv[]) {
         return -1;
     }
 
-    input = (char *)calloc (1000000, sizeof(char));
+    input = (char *)calloc (MEMORY_SIZE, sizeof(char));
 
     while ((c = fgetc(inputFile)) != EOF) {
+        if (c == '\n') continue;
         input[length] = c;
         length++;
+    }
+    length--;
+
+    if (high > length) {
+        printf ("Upper boundary too high: input length is %d\n", length);
+        return -1;
     }
 
     calculateBlockSizes(length, &block, &superblock);
@@ -42,12 +61,7 @@ int main (int argc, char* argv[]) {
 
     free(input);
 
-    printf ("First rank op: %d\n", rankOperation(tree, 'A', 588));
-    printf ("Second rank op: %d\n", rankOperation(tree, 'T', 588));
-    printf ("Third rank op: %d\n", rankOperation(tree, 'G', 588));
-    printf ("Fourth rank op: %d\n", rankOperation(tree, 'C', 588));
-
-    scanf ("%d", &length);
+    printf ("Rank(%c, %d) - Rank (%c, %d) is: %d\n", s_char, high, s_char, low, rankOperation(tree, s_char, high) - rankOperation(tree, s_char, low));
 
     return 0;
 
@@ -90,7 +104,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
         node->rrr = bitmapToRRR(node->bitmap);
 
-        nodeToString(node);
+        //nodeToString(node);
 
         node->leftChild = NULL;
         node->rightChild = NULL;
@@ -99,7 +113,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
     } else if (dictLength == 3) {
 
 
-        secondChildInput = (char *)calloc (1000000, sizeof (char));
+        secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
 
         for (i = 0; i < length; ++i) {
             if (getDictionaryValue(node->dict, node->dictLength, input[i])) {
@@ -115,7 +129,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
         node->rrr = bitmapToRRR(node->bitmap);
 
-        nodeToString(node);
+        //nodeToString(node);
 
         Dictionary *rightDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
         splitDictionary(node->dict, NULL, rightDict, node->dictLength, &leftDictLength, &rightDictLength);
@@ -129,8 +143,8 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
     } else {
 
-         firstChildInput = (char *)calloc (1000000, sizeof (char));
-         secondChildInput = (char *)calloc (1000000, sizeof (char));
+         firstChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
+         secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
 
         for (i = 0; i < length; ++i) {
             if (getDictionaryValue(node->dict, node->dictLength, input[i])) {
@@ -149,7 +163,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
         node->rrr = bitmapToRRR(node->bitmap);
 
-        nodeToString(node);
+        //nodeToString(node);
 
         Dictionary *rightDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
         Dictionary *leftDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
@@ -171,7 +185,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
     int i, j;
     bool exist;
-    Dictionary *dictionary = (Dictionary *)calloc (256, sizeof (Dictionary));
+    Dictionary *dictionary = (Dictionary *)calloc (DICTIONARY_SIZE, sizeof (Dictionary));
 
     *dictLength = 0;
     for (i = 0; i < length; ++i) {
@@ -208,12 +222,12 @@ void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightD
     *rightLength = 0;
 
     for (i = 0; i < dictLength; ++i) {
-        if (dict[i].value == 0) {
-            printf ("Left length: %d\n", *leftLength);
+        if (dict[i].value == 0 && leftDict != NULL) {
+            //printf ("Left length: %d\n", *leftLength);
             leftDict[*leftLength].character = dict[i].character;
             *leftLength += 1;
-        } else {
-            printf ("Right length: %d\n", *rightLength);
+        } else if (dict[i].value == 1 && rightDict != NULL) {
+            //printf ("Right length: %d\n", *rightLength);
             rightDict[*rightLength].character = dict[i].character;
             *rightLength += 1;
         }
@@ -279,8 +293,8 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
     offset_rem = i - (global_table->superblock_size * index);
     offset_rem -= blocks_rem * global_table->block_size;
 
-    printf ("Length: %d, Superblocks: %d, Blocks: %d, Remaining offset: %d\n", i, index, blocks_rem, offset_rem);
-
+    //printf ("\nLength: %d, Superblocks: %d, Blocks: %d, Remaining offset: %d\n", i, index, blocks_rem, offset_rem);
+    //printf ("Superblock sum: %d\n", Rank);
     while (blocks_rem > 0) {
         class_index = 0;
         for (k = j; k < j+global_table->class_bm; ++k) {
@@ -291,19 +305,24 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
         j += global_table->class_bm + global_table->entries[class_index].offset_bm;
         blocks_rem--;
     }
+
     class_index = 0;
+    //printf ("Before offset sum: %d\n", Rank);
+
     for (k = j; k < j+global_table->class_bm; ++k) {
         class_index = class_index << 1;
         class_index |= (rrr->bitmap->bm[k/8] >> (7 - (k % 8)) & 0x01);
     }
 
-    for (k = j + global_table->class_bm; k < j+global_table->entries[class_index].offset_bm; ++k) {
+    for (k = j + global_table->class_bm; k < j+ global_table->class_bm +global_table->entries[class_index].offset_bm; ++k) {
         offset = offset << 1;
-        offset |= (rrr->bitmap->bm[k/8] >> (7 - (k % 8)) & 0x01);
+        offset |= ((rrr->bitmap->bm[k/8] >> (7 - (k % 8))) & 0x01);
     }
 
     block = global_table->entries[class_index].offsets[offset];
+   // printf ("Block : 0x%04x\n", block);
     block = (block >> (global_table->block_size - offset_rem));
+    //printf ("Block : 0x%04x\n", block);
     Rank += popcountInt(block, true, offset_rem);
 
     if (c) {
@@ -406,7 +425,7 @@ void buildRRRTable (int block_size, int superblock_size) {
 
     for (i = 0; i < length; ++i) {
         index = popcountInt(i, true, block_size);
-       // printf ("I: %d, Class: %d, Offset_count: %d\n", i, index, global_table->entries[index].offset_count);
+        //printf ("I: %d, Class: %d, Offset_count: %d\n", i, index, global_table->entries[index].offset_count);
         global_table->entries[index].offsets[global_table->entries[index].offset_count] = i;
         global_table->entries[index].offset_count+=1;
         global_table->entries[index].offsets = realloc (global_table->entries[index].offsets, (global_table->entries[index].offset_count + 1)*sizeof(int));
@@ -430,7 +449,7 @@ RRRStruct *bitmapToRRR (BitMap *bm) {
     RRRStruct *rrr = (RRRStruct *)calloc (1, sizeof(RRRStruct));
     rrr->bitmap = (BitMap *) calloc (1, sizeof (BitMap));
 
-    char *bitmap = (char *)calloc (1000000, sizeof (char));
+    char *bitmap = (char *)calloc (MEMORY_SIZE, sizeof (char));
     rrr->superblock_sum = (int *) calloc (bm->length / global_table->superblock_size + 1, sizeof(int));
     rrr->superblock_offset = (int *) calloc (bm->length / global_table->superblock_size + 1, sizeof(int));
 
