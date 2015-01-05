@@ -1,5 +1,6 @@
 #include "WaveletTree.h"
 
+/** Structure used for keeping class -> offsets data */
 RRRTable *global_table;
 
 int main (int argc, char* argv[]) {
@@ -16,12 +17,13 @@ int main (int argc, char* argv[]) {
         printf ("Wrong number of parameters: WavletTree.exe filename char low_bound high_bound expected\n");
         return -1;
     }
-
+    /** Arguments input */
     filename = argv[1];
     s_char = argv[2][0];
     low = atoi(argv[3]);
     high = atoi(argv[4]);
 
+    /** Checking boundaries */
     if (low >= high) {
         printf ("Wrong boundaries!\n");
         return -1;
@@ -32,6 +34,7 @@ int main (int argc, char* argv[]) {
         return -1;
     }
 
+    /** Opening input file */
     inputFile = fopen(filename, "r");
 
     if (inputFile == NULL) {
@@ -39,8 +42,10 @@ int main (int argc, char* argv[]) {
         return -1;
     }
 
+    /** Allocating memory space for input string */
     input = (char *)calloc (MEMORY_SIZE, sizeof(char));
 
+    /** Reading through file and skipping newline characters */
     while ((c = fgetc(inputFile)) != EOF) {
         if (c == '\n') continue;
         input[length] = c;
@@ -48,73 +53,101 @@ int main (int argc, char* argv[]) {
     }
     length--;
 
+    /** Checking if the upper boundary is too high */
     if (high > length) {
         printf ("Upper boundary too high: input length is %d\n", length);
         return -1;
     }
 
+    /** Calculating block and superblock sizes based on
+        input length */
     calculateBlockSizes(length, &block, &superblock);
-    buildRRRTable(block, superblock);
-    RRRTableToString();
 
+    /** Creating the RRR table */
+    buildRRRTable(block, superblock);
+
+    //RRRTableToString();
+
+    /** Building the wavelet tree */
     tree = buildWaveletTree(input, length);
 
     free(input);
 
+    /** Result of the rank operation */
     printf ("Rank(%c, %d) - Rank (%c, %d) is: %d\n", s_char, high, s_char, low, rankOperation(tree, s_char, high) - rankOperation(tree, s_char, low));
 
     return 0;
 
 }
 
+/** This function is used for building the wavelet tree.
+    It takes input string and it's length as parameters. */
 WaveletTree *buildWaveletTree(char* input, int length) {
-
     int dictLength;
+
+    /** Allocating memory space for wavelet tree structure */
     WaveletTree *tree = (WaveletTree *)calloc (1, sizeof (WaveletTree));
+
+    /** Extracting the alphabet from the input and creating
+        a 'dictionary' */
     Dictionary *dict = extractAlphabet (input, length, &dictLength);
 
+    /** Calling the recursive function which creates tree nodes */
     tree->rootNode = buildWaveletNode(input, length, dict, dictLength);
 
     return tree;
-
 }
 
+/** Function which is used for creating the tree node */
 WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int dictLength) {
-
     int i, firstChildLength = 0, secondChildLength = 0, rightDictLength, leftDictLength;
     char *firstChildInput, *secondChildInput, *bitmap;
+
+    /**Allocating memory space for WaveletNode and BitMap structures */
     WaveletNode *node = (WaveletNode *)calloc (1, sizeof (WaveletNode));
     node->bitmap = (BitMap *)calloc (1, sizeof (BitMap));
 
+    /** Storing dictionary recieved as a parameter */
     node->dict = dict;
     node->dictLength = dictLength;
 
+    /** Bitmap is represented as the array of characters */
     bitmap = (char *)calloc (length/8 + 1, sizeof (char));
 
+    /** If there are only 2 letters in the dictionary this node
+        is a leaf */
     if (dictLength == 2) {
 
+        /** Creating bitmap from input string based on letter value
+            stred in dictionary (0 or 1) */
         for (i = 0; i < length; ++i) {
             if (getDictionaryValue(node->dict, node->dictLength, input[i])) {
                 bitmap[i/8] |= 0x80 >> (i%8);
             }
         }
 
+        /** Storing bitmap */
         node->bitmap->bm = bitmap;
         node->bitmap->length = length;
 
+        /** Creating RRR structure from bitmap */
         node->rrr = bitmapToRRR(node->bitmap);
 
         //nodeToString(node);
 
+        /** This node is a leaf */
         node->leftChild = NULL;
         node->rightChild = NULL;
 
-        return node;
+    /** If node has 3 letters in a dictionary it will have
+        only one child node (in this case it will always be
+        right child node */
     } else if (dictLength == 3) {
-
 
         secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
 
+        /** Input string to bitmap, and also storing the letters with
+            value 1 as input string for the right child node */
         for (i = 0; i < length; ++i) {
             if (getDictionaryValue(node->dict, node->dictLength, input[i])) {
                 secondChildInput[secondChildLength] = input[i];
@@ -124,22 +157,24 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
             }
         }
 
+        /** Storing the bitmap */
         node->bitmap->bm = bitmap;
         node->bitmap->length = length;
 
+        /** Creating RRR structure from bitmap */
         node->rrr = bitmapToRRR(node->bitmap);
 
         //nodeToString(node);
 
+        /** Creating dictionaries for children nodes (in this case only right child */
         Dictionary *rightDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
         splitDictionary(node->dict, NULL, rightDict, node->dictLength, &leftDictLength, &rightDictLength);
 
+        /** Recursive call only on right child */
         node->leftChild = NULL;
         node->rightChild = buildWaveletNode(secondChildInput, secondChildLength, rightDict, rightDictLength);
 
         free(secondChildInput);
-
-        return node;
 
     } else {
 
@@ -175,9 +210,9 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
         free(firstChildInput);
         free(secondChildInput);
-
-        return node;
     }
+
+    return node;
 
 
 }
