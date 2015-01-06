@@ -47,10 +47,6 @@ bool getDictionaryValue (Dictionary *dict, int dictLength, char c);
     of input string */
 int rankOperation (WaveletTree *tree, char c, int i);
 
-/** Function which calculates popcount (number of bits with value 1) from
-    the RRR structure */
-int popcountRRR (RRRStruct *rrr, bool c, int i);
-
 /** Popcount used for counting 1's in bitmap from 0 to i (bitmap is char array) */
 int popcount (char *bitmap, bool c, int i);
 
