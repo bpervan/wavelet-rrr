@@ -12,6 +12,7 @@
     nodes */
 struct WaveletNode {
     RRRStruct *rrr;
+    RRRTable *table;
     BitMap *bitmap;
     Dictionary* dict;
     int dictLength;

@@ -10,7 +10,7 @@ int main (int argc, char* argv[]) {
     char c, s_char;
     WaveletTree *tree = NULL;
 
-    global_table = (RRRTable *)calloc (1, sizeof(RRRTable));
+    //global_table = (RRRTable *)calloc (1, sizeof(RRRTable));
 
     if (argc != 5) {
         printf ("Wrong number of parameters: WavletTree.exe filename char low_bound high_bound expected\n");
@@ -59,10 +59,10 @@ int main (int argc, char* argv[]) {
 
     /** Calculating block and superblock sizes based on
         input length */
-    calculateBlockSizes(length, &block, &superblock);
+    //calculateBlockSizes(length, &block, &superblock);
 
     /** Creating the RRR table */
-    buildRRRTable(block, superblock);
+    //buildRRRTable(block, superblock);
 
     //RRRTableToString();
 

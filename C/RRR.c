@@ -2,8 +2,9 @@
 
 /** Function which is used for creating RRRTable based on
     block size and superblock size */
-void buildRRRTable (int block_size, int superblock_size) {
+RRRTable *buildRRRTable (int block_size, int superblock_size) {
     int length = 1, i, index, j, class_bm = 0;
+    RRRTable *global_table = (RRRTable *)calloc (1, sizeof(RRRTable));
 
     /** Initialization */
     global_table->entries = (RRRTableEntry *) calloc (block_size + 1, sizeof (RRRTableEntry));
@@ -52,10 +53,12 @@ void buildRRRTable (int block_size, int superblock_size) {
         global_table->entries[i].offset_bm = offset_bm;
 
     }
+
+    return global_table;
 }
 
 /** Function which converts regular bitmap to RRR structure */
-RRRStruct *bitmapToRRR (BitMap *bm) {
+RRRStruct *bitmapToRRR (BitMap *bm, RRRTable *global_table) {
     int length = 0, i, j, block, index, offset = 0, superblock_sum = 0;
 
     /** Initialization */
@@ -120,7 +123,7 @@ RRRStruct *bitmapToRRR (BitMap *bm) {
 
 /** Function which calculates popcount (number of bits with value 1) from
     the RRR structure */
-int popcountRRR (RRRStruct *rrr, bool c, int i) {
+int popcountRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
     int j, k, Rank, index, class_index, blocks_rem, offset = 0, block, offset_rem;
 
     /** Calculating starting superblock and adding
@@ -128,6 +131,8 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
     index = i/global_table->superblock_size;
     Rank = rrr->superblock_sum[index];
     j = rrr->superblock_offset[index];
+
+    //printf ("Rank after supreblocks: %d\n", Rank);
 
     /** Calculating number of blocks we need to iterate through */
     blocks_rem = i - (global_table->superblock_size * index);
@@ -151,6 +156,7 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
 
         /** Class index is popcount for that block so we add it to overall sum */
         Rank += class_index;
+        //printf ("Rank after block %d: %d\n", blocks_rem,  Rank);
         j += global_table->class_bm + global_table->entries[class_index].offset_bm;
         blocks_rem--;
     }
@@ -183,7 +189,7 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
     }
 }
 
-void RRRTableToString (){
+void RRRTableToString (RRRTable *global_table){
     int i, j;
 
     printf ("Block size: %d\n", global_table->block_size);

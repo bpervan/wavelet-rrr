@@ -18,7 +18,8 @@ WaveletTree *buildWaveletTree(char* input, int length) {
 
 /** Function which is used for creating the tree node */
 WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int dictLength) {
-    int i, firstChildLength = 0, secondChildLength = 0, rightDictLength, leftDictLength;
+    int i, firstChildLength = 0, secondChildLength = 0,
+            rightDictLength, leftDictLength, block = 0, superblock = 0;
     char *firstChildInput, *secondChildInput, *bitmap;
     WaveletNode *node = (WaveletNode *)calloc (1, sizeof (WaveletNode));
     node->bitmap = (BitMap *)calloc (1, sizeof (BitMap));
@@ -29,6 +30,13 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
     /** Bitmap is represented as an array of characters */
     bitmap = (char *)calloc (length/8 + 1, sizeof (char));
+
+     /** Calculating block and superblock sizes based on
+        input length */
+    calculateBlockSizes(length, &block, &superblock);
+
+    /** Creating the RRR table */
+    node->table = buildRRRTable(block, superblock);
 
     /** If there are only 2 letters in the dictionary this node
         is a leaf */
@@ -47,7 +55,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         node->bitmap->length = length;
 
         /** Creating RRR structure from bitmap */
-        node->rrr = bitmapToRRR(node->bitmap);
+        node->rrr = bitmapToRRR(node->bitmap, node->table);
 
         //nodeToString(node);
 
@@ -78,7 +86,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         node->bitmap->length = length;
 
         /** Creating RRR structure from bitmap */
-        node->rrr = bitmapToRRR(node->bitmap);
+        node->rrr = bitmapToRRR(node->bitmap, node->table);
 
         //nodeToString(node);
 
@@ -116,7 +124,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         node->bitmap->length = length;
 
          /** Creating RRR structure from bitmap */
-        node->rrr = bitmapToRRR(node->bitmap);
+        node->rrr = bitmapToRRR(node->bitmap, node->table);
 
         //nodeToString(node);
 
@@ -245,7 +253,8 @@ int rankOperation (WaveletTree *tree, char c, int i) {
         The operation is finished when there is no more children nodes */
     while (current != NULL) {
         //Rank = popcount (current->bitmap->bm, getDictionaryValue(current->dict,current->dictLength,c), Rank);
-        Rank = popcountRRR (current->rrr, getDictionaryValue(current->dict,current->dictLength,c), Rank);
+        Rank = popcountRRR (current->rrr, getDictionaryValue(current->dict,current->dictLength,c),
+                            Rank, current->table);
         if (getDictionaryValue(current->dict, current->dictLength, c)) {
             current = current->rightChild;
         } else {

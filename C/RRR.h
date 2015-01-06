@@ -36,19 +36,19 @@ typedef struct {
 } RRRTable;
 
 /** Structure used for keeping class -> offsets data */
-RRRTable *global_table;
+//RRRTable *global_table;
 
 /** Function which is used for creating RRRTable based on
     block size and superblock size */
-void buildRRRTable (int block_size, int superblock_size);
+RRRTable *buildRRRTable (int block_size, int superblock_size);
 
 void RRRTableToString ();
 
 /** Function which converts regular bitmap to RRR structure */
-RRRStruct *bitmapToRRR (BitMap *bm);
+RRRStruct *bitmapToRRR (BitMap *bm, RRRTable *global_table);
 
 /** Function which calculates popcount (number of bits with value 1) from
     the RRR structure */
-int popcountRRR (RRRStruct *rrr, bool c, int i);
+int popcountRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table);
 
 #endif // RRR_H
