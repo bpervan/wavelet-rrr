@@ -1,26 +1,10 @@
+#ifndef WAVELETTREE_H
+#define WAVELETTREE_H
+
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef enum {false, true} bool;
-
-#define MEMORY_SIZE 10000000
-#define DICTIONARY_SIZE 256
-
-typedef struct {
-    char character;
-    bool value;
-} Dictionary;
-
-typedef struct {
-    char *bm;
-    int length;
-} BitMap;
-
-typedef struct {
-    BitMap *bitmap;
-    int *superblock_offset;
-    int *superblock_sum;
-} RRRStruct;
+#include "RRR.h"
+#include "Utils.h"
 
 struct WaveletNode {
     RRRStruct *rrr;
@@ -36,20 +20,6 @@ typedef struct WaveletNode WaveletNode;
 typedef struct  {
     WaveletNode *rootNode;
 } WaveletTree;
-
-typedef struct {
-    int RRR_class;
-    int* offsets;
-    int offset_count;
-    int offset_bm;
-} RRRTableEntry;
-
-typedef struct {
-    int block_size;
-    int superblock_size;
-    RRRTableEntry *entries;
-    int class_bm;
-} RRRTable;
 
 WaveletTree *buildWaveletTree (char *input, int length);
 
@@ -72,11 +42,4 @@ void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightD
 
 void calculateBlockSizes (int length, int *block, int *superblock);
 
-void buildRRRTable (int block_size, int superblock_size);
-
-void RRRTableToString ();
-
-RRRStruct *bitmapToRRR (BitMap *bm);
-
-
-
+#endif // WAVELETTREE_H
