@@ -11,4 +11,9 @@ typedef struct {
     bool value;
 } Dictionary;
 
+typedef struct {
+    char *bm;
+    int length;
+} BitMap;
+
 #endif // UTILS_H

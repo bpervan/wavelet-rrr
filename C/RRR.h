@@ -6,11 +6,6 @@
 #include "Utils.h"
 
 typedef struct {
-    char *bm;
-    int length;
-} BitMap;
-
-typedef struct {
     BitMap *bitmap;
     int *superblock_offset;
     int *superblock_sum;

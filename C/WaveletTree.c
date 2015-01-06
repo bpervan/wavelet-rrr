@@ -4,8 +4,6 @@
     It takes input string and it's length as parameters. */
 WaveletTree *buildWaveletTree(char* input, int length) {
     int dictLength;
-
-    /** Allocating memory space for wavelet tree structure */
     WaveletTree *tree = (WaveletTree *)calloc (1, sizeof (WaveletTree));
 
     /** Extracting the alphabet from the input and creating
@@ -22,8 +20,6 @@ WaveletTree *buildWaveletTree(char* input, int length) {
 WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int dictLength) {
     int i, firstChildLength = 0, secondChildLength = 0, rightDictLength, leftDictLength;
     char *firstChildInput, *secondChildInput, *bitmap;
-
-    /**Allocating memory space for WaveletNode and BitMap structures */
     WaveletNode *node = (WaveletNode *)calloc (1, sizeof (WaveletNode));
     node->bitmap = (BitMap *)calloc (1, sizeof (BitMap));
 
@@ -31,7 +27,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
     node->dict = dict;
     node->dictLength = dictLength;
 
-    /** Bitmap is represented as the array of characters */
+    /** Bitmap is represented as an array of characters */
     bitmap = (char *)calloc (length/8 + 1, sizeof (char));
 
     /** If there are only 2 letters in the dictionary this node
@@ -55,13 +51,13 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
         //nodeToString(node);
 
-        /** This node is a leaf */
+        /** This node is a leaf - no children nodes*/
         node->leftChild = NULL;
         node->rightChild = NULL;
 
     /** If node has 3 letters in a dictionary it will have
         only one child node (in this case it will always be
-        right child node */
+        right child node) */
     } else if (dictLength == 3) {
 
         secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
@@ -101,6 +97,8 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
          firstChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
          secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
 
+         /** Input string to bitmap, and also storing the letters with
+            values 0 and 1 as input string for the left and right child nodes */
         for (i = 0; i < length; ++i) {
             if (getDictionaryValue(node->dict, node->dictLength, input[i])) {
                 secondChildInput[secondChildLength] = input[i];
@@ -113,18 +111,21 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
             }
         }
 
+        /** Storing the bitmap */
         node->bitmap->bm = bitmap;
         node->bitmap->length = length;
 
+         /** Creating RRR structure from bitmap */
         node->rrr = bitmapToRRR(node->bitmap);
 
         //nodeToString(node);
 
+        /** Creating dictionaries for children nodes (in this case only right child */
         Dictionary *rightDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
         Dictionary *leftDict = (Dictionary *)calloc (node->dictLength, sizeof (Dictionary));
-
         splitDictionary(node->dict, leftDict, rightDict, node->dictLength, &leftDictLength, &rightDictLength);
 
+        /** Recursive call on both children nodes */
         node->leftChild = buildWaveletNode(firstChildInput, firstChildLength, leftDict, leftDictLength);
         node->rightChild = buildWaveletNode(secondChildInput, secondChildLength, rightDict, rightDictLength);
 
@@ -137,12 +138,17 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
 }
 
+/** This function is used for extracting different characters from string
+    and storing them in the Dictionary structure */
 Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
     int i, j;
     bool exist;
     Dictionary *dictionary = (Dictionary *)calloc (DICTIONARY_SIZE, sizeof (Dictionary));
-
     *dictLength = 0;
+
+    /** Iterating through the input string and checking if
+        the character already exists in the dictionary. If not
+        it is added */
     for (i = 0; i < length; ++i) {
         exist = false;
         for (j = 0; j < *dictLength; ++j) {
@@ -158,6 +164,9 @@ Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
         }
     }
 
+    /** Setting values for each character in the dictionary.
+        First half of the characters have value 0 and the other
+        half has 1. */
     for (i = 0; i < *dictLength; ++i) {
         if (i < *dictLength/2) {
             dictionary[i].value = 0;
@@ -169,6 +178,8 @@ Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
     return dictionary;
 }
 
+/** Function which is used for creating two dictionaries from one. Those are the
+    dictionaries which are passed to left and right child node */
 void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightDict,
                       int dictLength, int *leftLength, int *rightLength) {
 
@@ -176,19 +187,20 @@ void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightD
     *leftLength = 0;
     *rightLength = 0;
 
+    /** If the character value is 0 it is added to a left node's dictionary.
+        If the character value is 1 it is added to a right node's dictionary. */
     for (i = 0; i < dictLength; ++i) {
         if (dict[i].value == 0 && leftDict != NULL) {
-            //printf ("Left length: %d\n", *leftLength);
             leftDict[*leftLength].character = dict[i].character;
             *leftLength += 1;
         } else if (dict[i].value == 1 && rightDict != NULL) {
-            //printf ("Right length: %d\n", *rightLength);
             rightDict[*rightLength].character = dict[i].character;
             *rightLength += 1;
         }
     }
 
-     for (i = 0; i < *leftLength; ++i) {
+    /** Setting values for the left dictionary */
+    for (i = 0; i < *leftLength; ++i) {
         if (i < *leftLength/2) {
             leftDict[i].value = 0;
         } else {
@@ -196,6 +208,7 @@ void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightD
         }
     }
 
+    /** Setting values for the right dictionary */
     for (i = 0; i < *rightLength; ++i) {
         if (i < *rightLength/2) {
             rightDict[i].value = 0;
@@ -205,6 +218,8 @@ void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightD
     }
 }
 
+/** Function which returns true or false based on character value in
+    the dictionary */
 bool getDictionaryValue (Dictionary *dict, int dictLength, char c) {
     int i;
 
@@ -217,11 +232,17 @@ bool getDictionaryValue (Dictionary *dict, int dictLength, char c) {
     return 0;
 }
 
+/** Function which represents rank operation. Rank (c, i) means
+    number of occurances of character c in the first i characters
+    of input string */
 int rankOperation (WaveletTree *tree, char c, int i) {
 
     int Rank = i;
     WaveletNode *current = tree->rootNode;
 
+    /** Starting with root node we move down in the hierarchy and caluculate
+        popcount which is used in the next popcount operation as a limit.
+        The operation is finished when there is no more children nodes */
     while (current != NULL) {
         //Rank = popcount (current->bitmap->bm, getDictionaryValue(current->dict,current->dictLength,c), Rank);
         Rank = popcountRRR (current->rrr, getDictionaryValue(current->dict,current->dictLength,c), Rank);
@@ -235,51 +256,64 @@ int rankOperation (WaveletTree *tree, char c, int i) {
     return Rank;
 }
 
+/** Function which calculates popcount (number of bits with value 1) from
+    the RRR structure */
 int popcountRRR (RRRStruct *rrr, bool c, int i) {
     int j, k, Rank, index, class_index, blocks_rem, offset = 0, block, offset_rem;
 
+    /** Calculating starting superblock and adding
+        previous superblocks' sum */
     index = i/global_table->superblock_size;
     Rank = rrr->superblock_sum[index];
-
     j = rrr->superblock_offset[index];
+
+    /** Calculating number of blocks we need to iterate through */
     blocks_rem = i - (global_table->superblock_size * index);
     blocks_rem /= global_table->block_size;
 
+    /** Calculating the number of bits in last block we need
+        to iterate through */
     offset_rem = i - (global_table->superblock_size * index);
     offset_rem -= blocks_rem * global_table->block_size;
 
-    //printf ("\nLength: %d, Superblocks: %d, Blocks: %d, Remaining offset: %d\n", i, index, blocks_rem, offset_rem);
-    //printf ("Superblock sum: %d\n", Rank);
+    /** Iterating through blocks and adding their value
+        to sum (Rank) */
     while (blocks_rem > 0) {
         class_index = 0;
+
+        /** Getting class index from RRR block */
         for (k = j; k < j+global_table->class_bm; ++k) {
             class_index = class_index << 1;
             class_index |= (rrr->bitmap->bm[k/8] >> (7 - (k % 8)) & 0x01);
         }
+
+        /** Class index is popcount for that block so we add it to overall sum */
         Rank += class_index;
         j += global_table->class_bm + global_table->entries[class_index].offset_bm;
         blocks_rem--;
     }
 
     class_index = 0;
-    //printf ("Before offset sum: %d\n", Rank);
 
+    /** Getting class index from the lest block */
     for (k = j; k < j+global_table->class_bm; ++k) {
         class_index = class_index << 1;
         class_index |= (rrr->bitmap->bm[k/8] >> (7 - (k % 8)) & 0x01);
     }
 
+    /** Getting offset index from the last block */
     for (k = j + global_table->class_bm; k < j+ global_table->class_bm +global_table->entries[class_index].offset_bm; ++k) {
         offset = offset << 1;
         offset |= ((rrr->bitmap->bm[k/8] >> (7 - (k % 8))) & 0x01);
     }
 
+    /** Getting the last block and calculating popcount */
     block = global_table->entries[class_index].offsets[offset];
-   // printf ("Block : 0x%04x\n", block);
     block = (block >> (global_table->block_size - offset_rem));
-    //printf ("Block : 0x%04x\n", block);
     Rank += popcountInt(block, true, offset_rem);
 
+    /** If c is true we are counting 1's and Rank is returned,
+        if c is false we are counting 0's and i - Rank is returned */
     if (c) {
         return Rank;
     } else {
@@ -287,6 +321,7 @@ int popcountRRR (RRRStruct *rrr, bool c, int i) {
     }
 }
 
+/** Popcount used for counting 1's in bitmap from 0 to i (bitmap is char array) */
 int popcount(char *bitmap, bool c, int i) {
     int j, Rank = 0;
 
@@ -303,6 +338,7 @@ int popcount(char *bitmap, bool c, int i) {
     }
 }
 
+/** Popcount used for counting 1's in bitmap from 0 to i (bitmap is int)*/
 int popcountInt(int bitmap, bool c, int i) {
     int j, Rank = 0;
 
@@ -319,6 +355,7 @@ int popcountInt(int bitmap, bool c, int i) {
     }
 }
 
+/** Debug function */
 void nodeToString (WaveletNode *node) {
     int i;
 
@@ -343,6 +380,8 @@ void nodeToString (WaveletNode *node) {
     printf ("\n");
 }
 
+/** Function which calculates block's and superblock's sizes based on
+    input string length */
 void calculateBlockSizes (int length, int *block, int *superblock) {
     int log2 = 0, length_pom = length;
 
