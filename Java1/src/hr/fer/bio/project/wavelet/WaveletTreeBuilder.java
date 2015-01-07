@@ -1,6 +1,7 @@
 package hr.fer.bio.project.wavelet;
 
 import hr.fer.bio.project.booleanarray.BooleanArray;
+import hr.fer.bio.project.rrr.RRRBlock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,26 @@ public class WaveletTreeBuilder {
         return tempnode;
     }
 
+    //TEST TEST TEST
+    public TreeNode<RRRBlock> fromStringRRR(String string){
+        return fromStringRRR(string, toMap(string), 0, string.length() - 1);
+    }
+    //TEST TEST TEST
+    private TreeNode<RRRBlock> fromStringRRR(String string, Map<Character, Boolean> charMap, int min, int max){
+        if(charMap.size() < 2){
+            return null;
+        }
+        int mid = min + (max - min) / 2;
+        TreeNode<RRRBlock> tempnode = new TreeNode<RRRBlock>(encodeStringRRR(string, charMap));
+        tempnode.charMap = charMap;
+        tempnode.leftChild = fromStringRRR(stringDivider(string, charMap)[0], toMap(stringDivider(string, charMap)[0]), min, mid - 1);
+        tempnode.rightChild = fromStringRRR(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
+        return tempnode;
+    }
+    //TEST TEST TEST
+    private RRRBlock encodeStringRRR(String string, Map<Character, Boolean> charMap){
+        return new RRRBlock(encodeString(string, charMap));
+    }
 
     private String[] stringDivider(String string, Map<Character, Boolean> charMap){
         StringBuilder sb1 = new StringBuilder();

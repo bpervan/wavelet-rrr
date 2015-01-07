@@ -2,6 +2,7 @@ package hr.fer.bio.project.main;
 
 import hr.fer.bio.project.booleanarray.BooleanArray;
 import hr.fer.bio.project.io.Fasta;
+import hr.fer.bio.project.rrr.RRRBlock;
 import hr.fer.bio.project.wavelet.TreeNode;
 import hr.fer.bio.project.wavelet.WaveletTreeBuilder;
 
@@ -20,7 +21,7 @@ public class Main {
     public static void main(String[] args) throws IOException{
         Fasta eColi = Fasta.fromFile("d:\\ecoli.fa");
         long time1 = System.nanoTime();
-        TreeNode<BooleanArray> rootNode = WaveletTreeBuilder.getInstance().fromString(eColi.getReadings());
+        TreeNode<RRRBlock> rootNode = WaveletTreeBuilder.getInstance().fromStringRRR(eColi.getReadings());
         long time2 = System.nanoTime();
         System.out.println("Wavelet tree with RRR nodes created in " + (time2 - time1) + " ns");
 
