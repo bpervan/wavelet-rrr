@@ -13,134 +13,213 @@ namespace WaveletTreeRRR
         private String originalSequence;
         private ArrayList alphabet;
         private WaveletNode rootNode;
- 
+
         public WaveletTreeRRR(string[] args)
-		{
-			alphabet = new ArrayList();
-			rootNode = new WaveletNode();
+        {
+            alphabet = new ArrayList();
+            rootNode = new WaveletNode();
 
-			if (args.Length != 3)
-			{
-				throw new Exception("Error. Check your arguments.");
-			}
+            if (args.Length != 3)
+            {
+                throw new Exception("Error. Check your arguments.");
+            }
 
-			readFile(args[0]);
-			Console.WriteLine(commentLines);
-			Console.WriteLine("Sequence has" + originalSequence.Length + " characters");
-		
-			getAlphabet();
-			
+            readFile(args[0]);
+            Console.WriteLine(commentLines);
+            Console.WriteLine("Sequence has" + originalSequence.Length + " characters");
+
+            getAlphabet();
+
+            buildWaveletTree(alphabet, originalSequence, rootNode);
 
 
         }
         private void readFile(String filePath)
-		{
+        {
 
-			try
-			{
-				string[] allLines= System.IO.File.ReadAllLines(filePath);
+            try
+            {
+                string[] allLines = System.IO.File.ReadAllLines(filePath);
 
-				StringBuilder sb = new StringBuilder();
-				StringBuilder comments = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
+                StringBuilder comments = new StringBuilder();
 
-				foreach (string line in allLines)
-				{
-					if (!(line.StartsWith(">") || line.StartsWith(";")))
-					{
-						sb.Append( line);
-					}
-					else
-					{
-						comments.Append(line); 
-					}
+                foreach (string line in allLines)
+                {
+                    if (!(line.StartsWith(">") || line.StartsWith(";")))
+                    {
+                        sb.Append(line);
+                    }
+                    else
+                    {
+                        comments.Append(line);
+                    }
 
-					originalSequence = sb.ToString();
-					commentLines = comments.ToString();           
-				}
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Error. Check the filepath.");
-			}
+                    originalSequence = sb.ToString();
+                    commentLines = comments.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error. Check the filepath.");
+            }
 
-		}
+        }
 
         public void getAlphabet()
-		{
-			if (originalSequence.Length > 0)
-			{
+        {
+            if (originalSequence.Length > 0)
+            {
+
+                foreach (char c in originalSequence)
+                {
+                    if (!alphabet.Contains(Char.ToUpper(c)))
+                    {
+                        alphabet.Add(Char.ToUpper(c));
+
+                    }
+                }
+
+                alphabet.Sort();
 
 
-				foreach (char c in originalSequence)
-				{
-					if (!alphabet.Contains(Char.ToUpper(c)))
-					{
-						alphabet.Add(Char.ToUpper(c));
+            }
+            else
+            {
+                throw new Exception("Error. File has no data.");
+            }
+        }
 
-					}
-				}
+        public void buildWaveletTree(ArrayList currentAlphabet, String currentLabel, WaveletNode currentNode)
+        {
+            if (currentAlphabet.Count > 2)
+            {
+                StringBuilder bitmapBuilder = new StringBuilder();
+                StringBuilder leftLabel = new StringBuilder();
+                StringBuilder rightLabel = new StringBuilder();
+                int mid = (currentAlphabet.Count + 1) / 2;
 
-				alphabet.Sort();
+                foreach (char c in currentLabel)
+                {
+                    if (getIndex(c, currentAlphabet) < mid)
+                    {
+                        bitmapBuilder.Append("0");
+                        leftLabel.Append(Char.ToUpper(c));
+                    }
+                    else
+                    {
+                        bitmapBuilder.Append("1");
+                        rightLabel.Append(Char.ToUpper(c));
+                    }
+                }
 
 
-			}
-			else
-			{
-				throw new Exception("Error. File has no data.");
-			}
-		}
+                currentNode.setBitmap(bitmapBuilder.ToString());
 
-		
+                currentNode.setLeftChild(new WaveletNode());
+                currentNode.getLeftChild().setParent(currentNode);
+
+
+                buildWaveletTree(currentAlphabet.GetRange(0, mid), leftLabel.ToString(), currentNode.getLeftChild());
+
+                if (currentAlphabet.Count > 3)
+                {
+                    currentNode.setRightChild(new WaveletNode());
+                    currentNode.getRightChild().setParent(currentNode);
+                    buildWaveletTree(currentAlphabet.GetRange(mid, (currentAlphabet.Count - mid)),
+                        rightLabel.ToString(), currentNode.getRightChild());
+                }
+
+
+            }
+            else
+            {
+                if (currentAlphabet.Count == 2)
+                {
+                    StringBuilder bitmapBuilder = new StringBuilder();
+
+                    foreach (char c in currentLabel)
+                    {
+                        if (getIndex(c, currentAlphabet) + 1 == 1)
+                        {
+                            bitmapBuilder.Append("0");
+                        }
+                        else
+                        {
+                            bitmapBuilder.Append("1");
+                        }
+                    }
+
+                    currentNode.setBitmap(bitmapBuilder.ToString());
+                }
+
+                return;
+            }
+
+        }
+
+        public int getIndex(char c, ArrayList arrayList)
+        {
+            for (int i = 0; i < arrayList.Count; i++)
+            {
+                if (c == (char)arrayList[i])
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
     }
 
-    
 
-	class WaveletNode 
-	{
-		private String bitmap;
 
-		private WaveletNode parent;
-		private WaveletNode leftChild;
-		private WaveletNode rightChild;
- 
-		public String getBitmap()
-		{
-			return bitmap;
-		}
+    class WaveletNode
+    {
+        private String bitmap;
 
-		public void setBitmap(String bitmap)
-		{
-			this.bitmap = bitmap;
-		}
+        private WaveletNode parent;
+        private WaveletNode leftChild;
+        private WaveletNode rightChild;
 
-		public WaveletNode getLeftChild()
-		{
-			return leftChild;
-		}
+        public String getBitmap()
+        {
+            return bitmap;
+        }
 
-		public WaveletNode getRightChild()
-		{
-			return rightChild;
-		}
+        public void setBitmap(String bitmap)
+        {
+            this.bitmap = bitmap;
+        }
 
-		public void setLeftChild(WaveletNode child)
-		{
-			this.leftChild = child;
-		}
+        public WaveletNode getLeftChild()
+        {
+            return leftChild;
+        }
 
-		public void setRightChild(WaveletNode child)
-		{
-			this.rightChild = child;
-		}
+        public WaveletNode getRightChild()
+        {
+            return rightChild;
+        }
 
-		public void setParent(WaveletNode parent)
-		{
-			this.parent = parent;
-		}
+        public void setLeftChild(WaveletNode child)
+        {
+            this.leftChild = child;
+        }
 
-		public WaveletNode getParent()
-		{
-			return this.parent;
-		}
-	}
+        public void setRightChild(WaveletNode child)
+        {
+            this.rightChild = child;
+        }
+
+        public void setParent(WaveletNode parent)
+        {
+            this.parent = parent;
+        }
+
+        public WaveletNode getParent()
+        {
+            return this.parent;
+        }
+    }
 }
