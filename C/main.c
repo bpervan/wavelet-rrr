@@ -51,6 +51,8 @@ int main (int argc, char* argv[]) {
     }
     length--;
 
+    input = (char *) realloc (input, length * sizeof(char));
+
     /** Checking if the upper boundary is too high */
     if (bound > length) {
         printf ("Boundary too high: input length is %d\n", length);
@@ -101,6 +103,30 @@ int main (int argc, char* argv[]) {
     printf ("Rank(%c, %d) is: %d\n", s_char, bound, Rank);
     printf ("Calculating rank operation took %ld us\n", us);
 
-    return 0;
+    i = calculateNodeMemoryUsage (tree->rootNode);
 
+    printf ("Memory usage: %d\n", i);
+
+    return 0;
+}
+
+int calculateNodeMemoryUsage (WaveletNode *node) {
+    int i = 0, j, k;
+
+    if (node == NULL) return i;
+
+    i+= 2 * node->dictLength;
+    i+= 8 * node->rrr->bitmap->length / node->table->superblock_size;
+    i+= node->rrr->bitmap->length / 8 + 1;
+    for (j = 0; j < node->table->block_size + 1; ++j) {
+        i += 1;
+        for (k = 0; k < node->table->entries[j].offset_count; ++k) {
+            i += 2;
+        }
+    }
+
+    i+= calculateNodeMemoryUsage(node->leftChild);
+    i+= calculateNodeMemoryUsage(node->rightChild);
+
+    return i;
 }

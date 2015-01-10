@@ -5,9 +5,10 @@ input.fa - duljna genoma: 502
 input1.fa - duljina genoma: 4 570 937
 input2.fas - duljina genoma: 5 524 970
 
-Svaka FASTA datoteka sastoji se od linije zaglavlja (počinje s >) te genoma. Newline znakovi unutar genoma ignoriraju se (abeceda se sastoji od A, T, G i C znakova). 
+Svaka FASTA datoteka sastoji se od linije zaglavlja (počinje s >) te genoma. 
+Newline znakovi unutar genoma ignoriraju se (abeceda se sastoji od A, T, G i C znakova). 
 
-Tekstualna datoteka sadrži razne znakove.
+Tekstualna datoteka sadrži razne znakove (veličina abecede je 16).
 
 U direktoriju se nalazi i program za provjeru ispravnosti operacije rank:
 char_counter.c

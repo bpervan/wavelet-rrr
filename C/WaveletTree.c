@@ -68,7 +68,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         right child node) */
     } else if (dictLength == 3) {
 
-        secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
+        secondChildInput = (char *)calloc (length, sizeof (char));
 
         /** Input string to bitmap, and also storing the letters with
             value 1 as input string for the right child node */
@@ -102,8 +102,8 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
     } else {
 
-         firstChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
-         secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
+         firstChildInput = (char *)calloc (length, sizeof (char));
+         secondChildInput = (char *)calloc (length, sizeof (char));
 
          /** Input string to bitmap, and also storing the letters with
             values 0 and 1 as input string for the left and right child nodes */
@@ -182,7 +182,7 @@ Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
             dictionary[i].value = 1;
         }
     }
-
+    dictionary = realloc (dictionary, *dictLength * sizeof (Dictionary));
     return dictionary;
 }
 

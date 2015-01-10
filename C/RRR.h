@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "Utils.h"
 
 /** RRRstruct represents RRR structure for Wavelet node.
@@ -19,10 +20,10 @@ typedef struct {
     It also contains a number of bits used to represent
     offset_index */
 typedef struct {
-    int RRR_class;
-    int* offsets;
+    uint8_t RRR_class;
+    uint16_t* offsets;
     int offset_count;
-    int offset_bm;
+    uint8_t offset_bm;
 } RRRTableEntry;
 
 /** RRRTable is a table which contains block and superblock sizes.
