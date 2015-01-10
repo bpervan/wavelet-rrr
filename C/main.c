@@ -72,7 +72,7 @@ int main (int argc, char* argv[]) {
     gettimeofday(&end_time,NULL);
     us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
                        (1000000 * start_time.tv_sec + start_time.tv_usec));
-    printf ("Building wavelet tree from input length %d took %d us\n", length, us);
+    printf ("Building wavelet tree from input length %d took %ld us\n", length, us);
 
     /** Counting character occurance directly from input */
     Rank = 0;
@@ -86,7 +86,7 @@ int main (int argc, char* argv[]) {
     us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
                        (1000000 * start_time.tv_sec + start_time.tv_usec));
     printf ("Expected Rank value is %d\n", Rank);
-    printf ("Counting characters took %d us\n", us);
+    printf ("Counting characters took %ld us\n", us);
 
     free(input);
 
@@ -99,7 +99,7 @@ int main (int argc, char* argv[]) {
 
     /** Result of the rank operation */
     printf ("Rank(%c, %d) is: %d\n", s_char, bound, Rank);
-    printf ("Calculating rank operation took %d us\n", us);
+    printf ("Calculating rank operation took %ld us\n", us);
 
     return 0;
 
