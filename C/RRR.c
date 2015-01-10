@@ -12,7 +12,7 @@ RRRTable *buildRRRTable (int block_size, int superblock_size) {
     for (i = 0; i < block_size + 1; ++i) {
         global_table->entries[i].offset_count = 0;
         global_table->entries[i].RRR_class = i;
-        global_table->entries[i].offsets = (int *)calloc(1, sizeof(int));
+        global_table->entries[i].offsets = (uint16_t *)calloc(1, sizeof(uint16_t));
     }
 
     global_table->block_size = block_size;
@@ -38,7 +38,7 @@ RRRTable *buildRRRTable (int block_size, int superblock_size) {
         global_table->entries[index].offset_count+=1;
         global_table->entries[index].offsets =
                     realloc (global_table->entries[index].offsets,
-                    (global_table->entries[index].offset_count + 1)*sizeof(int));
+                    (global_table->entries[index].offset_count + 1)*sizeof(uint16_t));
     }
 
     /** Calculating number of bits needed to store and
@@ -112,6 +112,8 @@ RRRStruct *bitmapToRRR (BitMap *bm, RRRTable *global_table) {
 
         length += global_table->entries[index].offset_bm;
     }
+
+    bitmap = (char *)realloc (bitmap, length * sizeof(char));
 
     /** Setting the bitmap and its length into RRR structure */
     rrr->bitmap->bm = bitmap;

@@ -43,6 +43,9 @@ Dictionary *extractAlphabet (char *input, int length, int *dictLength);
     the dictionary */
 bool getDictionaryValue (Dictionary *dict, int dictLength, char c);
 
+/** Function which checks if the character is in dictionary */
+bool charInDict (Dictionary *dict, int dictLength, char c);
+
 /** Function which represents rank operation. Rank (c, i) means
     number of occurances of character c in the first i characters
     of input string */

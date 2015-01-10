@@ -68,7 +68,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         right child node) */
     } else if (dictLength == 3) {
 
-        secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
+        secondChildInput = (char *)calloc (length, sizeof (char));
 
         /** Input string to bitmap, and also storing the letters with
             value 1 as input string for the right child node */
@@ -102,8 +102,8 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
 
     } else {
 
-         firstChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
-         secondChildInput = (char *)calloc (MEMORY_SIZE, sizeof (char));
+         firstChildInput = (char *)calloc (length, sizeof (char));
+         secondChildInput = (char *)calloc (length, sizeof (char));
 
          /** Input string to bitmap, and also storing the letters with
             values 0 and 1 as input string for the left and right child nodes */
@@ -182,7 +182,7 @@ Dictionary *extractAlphabet (char *input, int length, int *dictLength) {
             dictionary[i].value = 1;
         }
     }
-
+    dictionary = realloc (dictionary, *dictLength * sizeof (Dictionary));
     return dictionary;
 }
 
@@ -240,6 +240,19 @@ bool getDictionaryValue (Dictionary *dict, int dictLength, char c) {
     return 0;
 }
 
+/** Function which checks if the character is in dictionary */
+bool charInDict (Dictionary *dict, int dictLength, char c) {
+    int i;
+
+    for (i = 0; i < dictLength; ++i) {
+        if (dict[i].character == c) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /** Function which represents rank operation. Rank (c, i) means
     number of occurances of character c in the first i characters
     of input string */
@@ -247,6 +260,9 @@ int rankOperation (WaveletTree *tree, char c, int i) {
 
     int Rank = i;
     WaveletNode *current = tree->rootNode;
+
+    if (!charInDict(current->dict, current->dictLength, c))
+        return 0;
 
     /** Starting with root node we move down in the hierarchy and caluculate
         popcount which is used in the next popcount operation as a limit.
