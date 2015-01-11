@@ -14,6 +14,9 @@ namespace WaveletTreeRRR
         private ArrayList alphabet;
         private WaveletNode rootNode;
 
+        private char symbol;
+        private int pos;
+
         public WaveletTreeRRR(string[] args)
         {
             alphabet = new ArrayList();
@@ -31,6 +34,10 @@ namespace WaveletTreeRRR
             getAlphabet();
 
             buildWaveletTree(alphabet, originalSequence, rootNode);
+
+            symbol = Char.ToUpper(Char.Parse(args[1]));
+            pos = int.Parse(args[2]) - 1;
+            Console.WriteLine(rank(rootNode, pos, symbol, alphabet));
 
 
         }
@@ -169,6 +176,57 @@ namespace WaveletTreeRRR
             }
 
             return -1;
+        }
+
+        public int rank(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
+        {
+
+            if (!currentAlphabet.Contains(character))
+            {
+                return 0;
+            }
+
+            int mid = (currentAlphabet.Count + 1) / 2;
+            int newIndex;
+            ArrayList currentAlphabetSliced = new ArrayList();
+
+            if (getIndex(character, currentAlphabet) < mid)
+            {
+                newIndex = index - countSetBits(currentNode.getBitmap(), index);
+                currentNode = currentNode.getLeftChild();
+                currentAlphabetSliced = currentAlphabet.GetRange(0, (currentAlphabet.Count - (mid - 1)));
+
+            }
+            else
+            {
+                newIndex = countSetBits(currentNode.getBitmap(), index) - 1;
+                currentNode = currentNode.getRightChild();
+                currentAlphabetSliced = currentAlphabet.GetRange(mid, (currentAlphabet.Count - mid));
+            }
+
+            if (currentNode != null)
+            {
+                return rank(currentNode, newIndex, character, currentAlphabetSliced);
+            }
+            else
+            {
+                return newIndex + 1;
+            }
+        }
+
+        public int countSetBits(String bitmap, int index)
+        {
+            int counter = 0;
+
+            for (int i = 0; i < bitmap.Length && i <= index; i++)
+            {
+                if (bitmap.ElementAt(i) == '1')
+                {
+                    counter++;
+                }
+            }
+
+            return counter;
         }
     }
 
