@@ -1,0 +1,1 @@
+c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.exe.config
