@@ -40,27 +40,86 @@ namespace WaveletTree
             }
         }
 
-        public int GetBlockLength()
+        public int BlockLength
         {
-            if (_blockLength <= 0)
+            get
             {
-                _blockLength = (int)Math.Floor(Math.Log(WordLength, 2) / 2);
-                return _blockLength;
+                if (_blockLength <= 0)
+                {
+                    _blockLength = (int)Math.Floor(Math.Log(WordLength, 2) / 2);
+                    return _blockLength;
+                }
+                else
+                    return _blockLength;
             }
-            else
-                return _blockLength;
         }
 
-        public int GetSuperBlockLength()
+        public int SuperBlockLength
         {
-            if (_superBlockLength <= 0)
+            get
             {
-                _superBlockLength = GetBlockLength() * (int)Math.Floor(Math.Log(WordLength, 2));
-                return _superBlockLength;
+                if (_superBlockLength <= 0)
+                {
+                    _superBlockLength = BlockLength * (int)Math.Floor(Math.Log(WordLength, 2));
+                    return _superBlockLength;
+                }
+                else
+                    return _superBlockLength;
             }
-            else
-                return _superBlockLength;
         }
+
+        private List<string> _blocks = new List<string>();
+
+        public List<string> Blocks
+        {
+            get
+            {
+                if (_blocks.Count() == 0)
+                {
+                    int i = 0;
+                    while (i < WordLength - BlockLength)
+                    {
+                        _blocks.Add(Word.Substring(i, BlockLength));
+                        i = i + _blockLength;
+                    }
+                    _blocks.Add(Word.Substring(i));
+                    return _blocks;
+                }
+                else 
+                    return _blocks;
+            }
+        }
+
+        private List<int> _blocksInfo = new List<int>();
+
+        public List<int> BlocksInfo 
+        {
+            get 
+            {
+                if (_blocksInfo.Count() == 0)
+                {
+                    foreach(var block in Blocks)
+                    {
+                        _blocksInfo.Add(GetRank(block));
+                      
+                    }
+                }
+                else
+                    return _blocksInfo;
+            }
+        }
+
+        private int GetRank(string query)
+        {
+            return query.Count(x => x == '1');
+        }
+
+        private List<string> _permutations = new List<string>();
+
+        
+
+
+
 
     }
 }
