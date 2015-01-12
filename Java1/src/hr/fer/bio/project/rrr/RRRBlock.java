@@ -35,6 +35,9 @@ public class RRRBlock implements Rankable {
         this.booleanArray = booleanArray;
         this.arrayLength = booleanArray.data.length;
         this.blockSize = RRRLookUpTable.log2(arrayLength) / 2;
+        if(this.blockSize == 0){
+            this.blockSize = 1;
+        }
         //this.blockSize = 5;
         this.superblockSize = this.blockSize * RRRLookUpTable.log2(arrayLength);
         //this.superblockSize = 2;
