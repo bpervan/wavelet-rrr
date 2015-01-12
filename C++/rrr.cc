@@ -181,6 +181,173 @@ uint32_t RRR::Rank0(uint32_t index) {
 	return rank;
 }
 
+// Returns index of n-th bit in bitmap with value 1
+uint32_t RRR::Select1(uint32_t n) {
+	if ((n >= length_) || (n > superblocks_[superblocks_.size() - 1])) {
+		return length_ + 1;
+	}
+
+	uint32_t index = 0;
+	uint32_t counter = 0;
+	uint32_t block_index = 0;
+
+	// Find superblock whose value is lower than n, but value of next is
+	// bigger than n
+	if (n > superblocks_[0]) {
+		uint32_t first = 0;
+		uint32_t last = superblocks_.size() - 1;
+		uint32_t middle = (first + last) / 2;
+		uint32_t superblock_index;
+		while (true) {
+			if (n == superblocks_[middle]) {
+				superblock_index = middle - 1;
+				break;
+			}
+			else if (n < superblocks_[middle]) {
+				if (middle == 0) {
+					superblock_index = 0;
+					break;
+				}
+				else if (n > superblocks_[middle - 1]) {
+					superblock_index = middle - 1;
+					break;
+				}
+
+				last = middle;
+			}
+			else {
+				if (n >= superblocks_[last]) {
+					superblock_index = last - 1;
+					break;
+				}
+				else if (n < superblocks_[middle + 1]) {
+					superblock_index = middle;
+					break;
+				}
+
+				first = middle;
+
+			}
+
+			middle = (first + last) / 2;
+		}
+
+		// Add value of previous superblock to counter
+		counter = superblocks_[superblock_index];
+		block_index = (superblock_index + 1) * blocks_per_superblock_;
+	}
+
+	// Iterate through blocks and add their popcounts to counter until value of
+	// (counter + block_popcount) is lower than n
+	while ((counter + blocks_[block_index].GetClass()) < n) {
+		counter += blocks_[block_index].GetClass();
+		block_index++;
+	}
+
+	index = bits_per_block_ * block_index;
+	uint16_t block = table_->GetBlock(	blocks_[block_index].GetClass(),
+										blocks_[block_index].GetOffset());
+
+	// Iterate through the block and increase value of counter until n is reached
+	uint16_t mask = 1 << (bits_per_block_ - 1);
+	while (counter < n) {
+		if (block & mask) {
+			counter++;
+			if (counter == n)
+				break;
+		}
+
+		mask = mask >> 1;
+		index++;
+	}
+
+	// Return index on which n is reached
+	return index;
+}
+
+// Returns index of n-th bit in bitmap with value 0
+uint32_t RRR::Select0(uint32_t n) {
+	if ((n >= length_) || (n > (length_ - superblocks_[superblocks_.size() - 1])))
+	{
+		return length_ + 1;
+	}
+
+	uint32_t index = 0;
+	uint32_t counter = 0;
+	uint32_t block_index = 0;
+
+	if (n > ((bits_per_block_ * blocks_per_superblock_) - superblocks_[0])) {
+		uint32_t first = 0;
+		uint32_t last = superblocks_.size() - 1;
+		uint32_t middle = (first + last) / 2;
+		uint32_t superblock_index;
+		uint32_t bits_per_superblock = bits_per_block_ * blocks_per_superblock_;
+		while (true) {
+			if (n == (((middle + 1) * bits_per_superblock) - superblocks_[middle])) {
+				superblock_index = middle - 1;
+				break;
+			}
+			else if (n < (((middle + 1) * bits_per_superblock) - superblocks_[middle]))
+			{
+				if (middle == 0) {
+					superblock_index = 0;
+					break;
+				}
+				else if (n >(((middle) * 	bits_per_superblock) -
+																	superblocks_[middle - 1])) {
+					superblock_index = middle - 1;
+					break;
+				}
+
+				last = middle;
+			}
+			else {
+				if (n >= ((last + 1 * bits_per_superblock) - superblocks_[last])) {
+					superblock_index = last - 1;
+					break;
+				}
+				else if (n < (((middle + 2) * bits_per_superblock) -
+																			superblocks_[middle + 1])) {
+					superblock_index = middle;
+					break;
+				}
+
+				first = middle;
+
+			}
+
+			middle = (first + last) / 2;
+		}
+
+		counter =  ((superblock_index + 1) * bits_per_superblock) -
+		 																			superblocks_[superblock_index];
+		block_index = (superblock_index + 1) * blocks_per_superblock_;
+	}
+
+	while ((counter + (bits_per_block_ - blocks_[block_index].GetClass())) < n) {
+		counter += (bits_per_block_ - blocks_[block_index].GetClass());
+		block_index++;
+	}
+
+	index = bits_per_block_ * block_index;
+	uint16_t block = table_->GetBlock(blocks_[block_index].GetClass(),
+		blocks_[block_index].GetOffset());
+
+	uint16_t mask = 1 << (bits_per_block_ - 1);
+	while (counter < n) {
+		if (!(block & mask)) {
+			counter++;
+			if (counter == n)
+				break;
+		}
+
+		mask = mask >> 1;
+		index++;
+	}
+
+	return index;
+}
+
 // Returns length of bitmap encoded with RRR structure
 uint32_t RRR::length() {
 	return length_;
