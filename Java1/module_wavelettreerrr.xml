@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_wavelettreerrr" default="compile.module.wavelettreerrr">
+  <dirname property="module.wavelettreerrr.basedir" file="${ant.file.module_wavelettreerrr}"/>
+  
+  <property name="module.jdk.home.wavelettreerrr" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.wavelettreerrr" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.wavelettreerrr" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.wavelettreerrr" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
+  
+  <property name="wavelettreerrr.output.dir" value="${module.wavelettreerrr.basedir}/out/production/WaveletTreeRRR"/>
+  <property name="wavelettreerrr.testoutput.dir" value="${module.wavelettreerrr.basedir}/out/test/WaveletTreeRRR"/>
+  
+  <path id="wavelettreerrr.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="wavelettreerrr.module.production.classpath">
+    <path refid="${module.jdk.classpath.wavelettreerrr}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+  </path>
+  
+  <path id="wavelettreerrr.runtime.production.module.classpath">
+    <pathelement location="${wavelettreerrr.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+  </path>
+  
+  <path id="wavelettreerrr.module.classpath">
+    <path refid="${module.jdk.classpath.wavelettreerrr}"/>
+    <pathelement location="${wavelettreerrr.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+  </path>
+  
+  <path id="wavelettreerrr.runtime.module.classpath">
+    <pathelement location="${wavelettreerrr.testoutput.dir}"/>
+    <pathelement location="${wavelettreerrr.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.wavelettreerrr">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.wavelettreerrr">
+    <patternset refid="excluded.from.module.wavelettreerrr"/>
+  </patternset>
+  
+  <path id="wavelettreerrr.module.sourcepath">
+    <dirset dir="${module.wavelettreerrr.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.wavelettreerrr" depends="compile.module.wavelettreerrr.production,compile.module.wavelettreerrr.tests" description="Compile module WaveletTreeRRR"/>
+  
+  <target name="compile.module.wavelettreerrr.production" description="Compile module WaveletTreeRRR; production classes">
+    <mkdir dir="${wavelettreerrr.output.dir}"/>
+    <javac destdir="${wavelettreerrr.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wavelettreerrr}/javac">
+      <compilerarg line="${compiler.args.wavelettreerrr}"/>
+      <bootclasspath refid="wavelettreerrr.module.bootclasspath"/>
+      <classpath refid="wavelettreerrr.module.production.classpath"/>
+      <src refid="wavelettreerrr.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.wavelettreerrr"/>
+    </javac>
+    
+    <copy todir="${wavelettreerrr.output.dir}">
+      <fileset dir="${module.wavelettreerrr.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.wavelettreerrr.tests" depends="compile.module.wavelettreerrr.production" description="compile module WaveletTreeRRR; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.wavelettreerrr" description="cleanup module">
+    <delete dir="${wavelettreerrr.output.dir}"/>
+    <delete dir="${wavelettreerrr.testoutput.dir}"/>
+  </target>
+</project>
