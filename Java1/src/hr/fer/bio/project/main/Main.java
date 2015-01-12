@@ -24,24 +24,24 @@ public class Main {
      * 2. java hr.fer.bio.project.main.Main pathToFastaFile character endPosition
      * */
     public static void main(String[] args) throws IOException{
-        if(args.length < 2 || args.length > 4){
+        if(args.length < 1 || args.length > 3){
             System.out.println("Arguments?");
             System.exit(-1);
         }
 
-        Fasta inputGenome = Fasta.fromFile(args[1]);
+        Fasta inputGenome = Fasta.fromFile(args[0]);
         long time1 = System.nanoTime();
         TreeNode<RRRBlock> rootNode = WaveletTreeBuilder.getInstance().fromStringRRR(inputGenome.getReadings());
         long time2 = System.nanoTime();
         System.out.println("Wavelet tree with RRR nodes created in " + (time2 - time1) + " ns");
 
         int resultRank;
-        if(args.length == 4){
+        if(args.length == 3){
             time1 = System.nanoTime();
             resultRank = rootNode.rank(args[2].charAt(0), Integer.parseInt(args[3]), rootNode);
             time2 = System.nanoTime();
             System.out.println("Rank: " + resultRank + ". Calculated in " + (time2 - time1) + " ns");
-        } else if(args.length == 2){
+        } else if(args.length == 1){
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
             String c = " ";
