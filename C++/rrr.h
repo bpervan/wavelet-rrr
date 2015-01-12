@@ -69,4 +69,4 @@ private:
 	int last_block_length_;
 };
 
-#endif /* RRR_BLOCK_H_*/
+#endif // RRR_H_

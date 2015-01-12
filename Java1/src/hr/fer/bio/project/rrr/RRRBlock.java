@@ -1,5 +1,6 @@
 package hr.fer.bio.project.rrr;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import hr.fer.bio.project.booleanarray.BooleanArray;
 import hr.fer.bio.project.main.Main;
 import hr.fer.bio.project.rankable.Rankable;
@@ -39,8 +40,11 @@ public class RRRBlock implements Rankable {
             this.blockSize = 1;
         }
         //this.blockSize = 5;
-        this.superblockSize = this.blockSize * RRRLookUpTable.log2(arrayLength);
+        //broj blokova u superbloku
+        //this.superblockSize = this.blockSize * RRRLookUpTable.log2(arrayLength);
+        this.superblockSize = RRRLookUpTable.log2(arrayLength);
         //this.superblockSize = 2;
+        //broj true/false u superbloku
         this.superblockCapacity = superblockSize * blockSize;
 
         classes = new ArrayList<Integer>();
@@ -187,19 +191,71 @@ public class RRRBlock implements Rankable {
         int newBound = boundary;
         int select = 0;
         while(workingNode != null){
-            int numSuperBlocks = this.arrayLength / this.superblockCapacity;
+            int numSuperBlocks = workingNode.data.arrayLength / workingNode.data.superblockCapacity;
+            int superblockCounter = 0;
             for(int i = 0; i < numSuperBlocks; ++i){
-                select++;
-                counter += workingNode.data.superblockData.get(i);
-                if(counter > newBound){
+
+                if(workingNode.charMap.get(c)){
+                    superblockCounter += workingNode.data.superblockData.get(i);
+                } else {
+                    superblockCounter += workingNode.data.superblockCapacity - workingNode.data.superblockData.get(i);
+                }
+
+                if(superblockCounter > newBound){
+                    break;
+                } else {
+                    counter = superblockCounter;
+                    select++;
+                }
+            }
+            //select--;
+            //problem s nulama i jedinicama
+            select = select * workingNode.data.superblockCapacity;
+            if(counter == newBound){
+                break;
+            }
+
+            int index = select / workingNode.data.blockSize;
+            int blockCounter = 0;
+            int iCache = 0;
+            for(int i = index; i < (index + workingNode.data.superblockSize); i += 1){
+                if(workingNode.charMap.get(c)){
+                    blockCounter = workingNode.data.classes.get(i);
+                } else {
+                    blockCounter = workingNode.data.blockSize - workingNode.data.classes.get(i);
+                }
+
+                if(blockCounter + counter > newBound){
+                    iCache = i;
+                    break;
+                } else {
+                    counter += blockCounter;
+                    select += workingNode.data.blockSize;
+                }
+            }
+            if(counter == newBound){
+                break;
+            }
+
+            BooleanArray tempArray = null;
+            Map<BooleanArray, Integer> block = workingNode.data.table.getTable().get(workingNode.data.classes.get(iCache));
+            for(Map.Entry<BooleanArray, Integer> entry : block.entrySet()){
+                if(entry.getValue().equals(workingNode.data.offsets.get(iCache))){
+                    tempArray = entry.getKey();
                     break;
                 }
             }
-            //problem s nulama i jedinicama
-            select = select * this.superblockCapacity;
+            for(int i = 0; i < tempArray.data.length; ++i){
+                if(counter == newBound){
+                    break;
+                }
+                if(tempArray.data[i] && workingNode.charMap.get(c)){
+                    counter++;
+                } else if (!tempArray.data[i] && !workingNode.charMap.get(c)){
+                    counter++;
+                }
 
-            int numBlocks = this.superblockSize;
-            for(int i = select; i < numBlocks; ++i){
+                select++;
 
             }
 
@@ -208,6 +264,6 @@ public class RRRBlock implements Rankable {
             select = 0;
             counter = 0;
         }
-        return 0;
+        return newBound;
     }
 }

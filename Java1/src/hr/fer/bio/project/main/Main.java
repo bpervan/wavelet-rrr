@@ -32,13 +32,13 @@ public class Main {
 
         Fasta inputGenome = Fasta.fromFile(args[0]);
         long time1 = System.nanoTime();
-        //TreeNode<RRRBlock> rootNode = WaveletTreeBuilder.getInstance().fromStringRRR(inputGenome.getReadings());
-        TreeNode<BooleanArray> rootNode = WaveletTreeBuilder.getInstance().fromString(inputGenome.getReadings());
+        TreeNode<RRRBlock> rootNode = WaveletTreeBuilder.getInstance().fromStringRRR(inputGenome.getReadings());
+        //TreeNode<BooleanArray> rootNode = WaveletTreeBuilder.getInstance().fromString(inputGenome.getReadings());
         long time2 = System.nanoTime();
         System.out.println("Wavelet tree with RRR nodes created in " + (time2 - time1) + " ns");
 
-        System.out.println(rootNode.rank('t', 100, rootNode));
-        System.out.println(rootNode.select('w', 2, rootNode));
+        System.out.println(rootNode.rank('G', 12345, rootNode));
+        System.out.println(rootNode.select('T', 1000000, rootNode));
         System.exit(0);
 
         int resultRank;
