@@ -205,7 +205,7 @@ int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
             superblock_sum = j * global_table->superblock_size - rrr->superblock_sum[j];
         }
 
-        if (sum + superblock_sum > i) {
+        if (sum + superblock_sum > i || j == rrr->superblock_num - 1) {
             index = rrr->superblock_offset[j-1];
             Select = (j - 1)* global_table->superblock_size;
             break;
@@ -217,6 +217,8 @@ int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
     /** Iterating through blocks */
     while (1) {
         class_index = 0;
+
+        if (index > rrr->bitmap->length) return -1;
 
         /** Getting class index from RRR block */
         for (k = index; k < index+global_table->class_bm; ++k) {
@@ -245,13 +247,14 @@ int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
     class_index = 0;
 
     /** Getting class index from RRR block */
-    for (k = index; k < index+global_table->class_bm; ++k) {
+    for (k = index; k < index+global_table->class_bm && k < rrr->bitmap->length; ++k) {
         class_index = class_index << 1;
         class_index |= (rrr->bitmap->bm[k/8] >> (7 - (k % 8)) & 0x01);
     }
 
     /** Getting offset index from the last block */
-    for (k = index + global_table->class_bm; k < index+ global_table->class_bm +global_table->entries[class_index].offset_bm; ++k) {
+    for (k = index + global_table->class_bm; k < index+ global_table->class_bm +
+            global_table->entries[class_index].offset_bm && k < rrr->bitmap->length; ++k) {
         offset = offset << 1;
         offset |= ((rrr->bitmap->bm[k/8] >> (7 - (k % 8))) & 0x01);
     }

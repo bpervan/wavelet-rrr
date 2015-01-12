@@ -273,10 +273,10 @@ int rankOperation (WaveletTree *tree, char c, int i) {
         popcount which is used in the next popcount operation as a limit.
         The operation is finished when there is no more children nodes */
     while (current != NULL) {
-        //Rank = popcount (current->bitmap->bm, getDictionaryValue(current->dict,current->dictLength,c), Rank);
-        Rank = popcountRRR (current->rrr, getDictionaryValue(current->dict,current->dictLength,c),
-                            Rank, current->table);
-        if (getDictionaryValue(current->dict, current->dictLength, c)) {
+        bool value = getDictionaryValue(current->dict, current->dictLength, c);
+        //Rank = popcount (current->bitmap->bm, value, Rank);
+        Rank = popcountRRR (current->rrr, value, Rank, current->table);
+        if (value) {
             current = current->rightChild;
         } else {
             current = current->leftChild;
@@ -308,8 +308,9 @@ int selectOperation (WaveletTree *tree, char c, int i) {
 
     /** Performing select operation */
     while (current != NULL) {
-        Select = selectRRR (current->rrr, getDictionaryValue(current->dict, current->dictLength, c),
-                            Select, current->table);
+        bool value = getDictionaryValue(current->dict, current->dictLength, c);
+        Select = select(current->bitmap->bm, value, Select, current->bitmap->length);
+        //Select = selectRRR (current->rrr, value, Select, current->table);
         //printf ("Select: %d", Select);
         current = current->parent;
     }
@@ -332,6 +333,25 @@ int popcount(char *bitmap, bool c, int i) {
     } else {
         return i - Rank;
     }
+}
+
+int select(char *bitmap, bool c, int i, int length) {
+    int j, Rank = 0, Select = 0;
+
+    for (j = 0; j < length; ++j) {
+        if ((bitmap[j/8] & (0x80 >> (j%8))) != 0x00 && c) {
+            Rank++;
+        } else if ((bitmap[j/8] & (0x80 >> (j%8))) == 0x00 && !c) {
+            Rank++;
+        }
+        Select++;
+
+        if (Rank == i) {
+            return Select;
+        }
+    }
+
+    return -1;
 }
 
 /** Popcount used for counting 1's in bitmap from 0 to i (bitmap is int)*/
@@ -387,5 +407,6 @@ void calculateBlockSizes (int length, int *block, int *superblock) {
     }
 
     *block = log2 / 2;
+    if (*block == 0) *block = 1;
     *superblock = *block * log2;
 }
