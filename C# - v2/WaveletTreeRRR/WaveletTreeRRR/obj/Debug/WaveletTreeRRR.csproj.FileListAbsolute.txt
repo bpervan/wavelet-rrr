@@ -1,1 +1,6 @@
 D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\bin\Debug\WaveletTreeRRR.exe.config
+D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\obj\Debug\WaveletTreeRRR.csprojResolveAssemblyReference.cache
+D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\bin\Debug\WaveletTreeRRR.exe
+D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\bin\Debug\WaveletTreeRRR.pdb
+D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\obj\Debug\WaveletTreeRRR.exe
+D:\BIOINFORMATIKA_PROJEKT\wavelet-rrr\C# - v2\WaveletTreeRRR\WaveletTreeRRR\obj\Debug\WaveletTreeRRR.pdb

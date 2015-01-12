@@ -128,9 +128,11 @@ namespace WaveletTreeRRR
                 currentNode.setBitmap(bitmapBuilder.ToString());
 
                 blockSize = (int)(Math.Log(currentNode.getBitmap().Length, 2) / 2);
-                superblockSize = (int)(currentNode.RRRTable.BlockSize * Math.Floor(Math.Log(currentNode.getBitmap().Length, 2)));
+                superblockSize = (int)(blockSize* Math.Floor(Math.Log(currentNode.getBitmap().Length, 2)));
                 currentNode.RRRTable.BlockSize = blockSize;
                 currentNode.RRRTable.SuperblockSize = superblockSize;
+                currentNode.RRRTable.ClassBitsNeeded = (int)Math.Floor(Math.Log(blockSize, 2)) + 1;
+                currentNode.RRRTable.buildTableG();
 
 
 
@@ -324,7 +326,9 @@ namespace WaveletTreeRRR
     class RRRLookupTable {
         private int blockSize;
         private int superblockSize;
-        Dictionary<string, List<int>> tableG = new Dictionary<string, List<int>>();
+        Dictionary<int, List<string>> tableG;
+
+       
         private int classBitsNeeded;
 
         public int BlockSize {
@@ -339,7 +343,73 @@ namespace WaveletTreeRRR
             get; 
             set; 
         }
-    };
+        public Dictionary<int, List<string>> TableG
+        {
+            get { return tableG; }
+            set { tableG = value; }
+        }  
 
+        //construction of Lookup Table for RRR structure
+        public void buildTableG() {
 
+           TableG = new Dictionary<int, List<string>>();
+            
+            for(int i=0; i<=BlockSize; i++)
+              {
+                List<string> offsets = new List<string>();
+                StringBuilder initOffset= new StringBuilder();
+                //int numOfOffsets =(int)(GetBinCoeff(blockSize, i));
+                for (int j = 0; j < BlockSize; j++)
+                    if (j <= BlockSize - 1 - i)  //i broj jedinica
+                        initOffset.Append("0");
+                    else initOffset.Append("1");
+
+                Permutation(initOffset.ToString(), offsets);
+                TableG.Add(i, offsets);
+            }
+    
+        }
+
+        public static string ToBin(int value, int len)
+        {
+            return (len > 1 ? ToBin(value >> 1, len - 1) : null) + "01"[value & 1];
+        }
+
+        public static long GetBinCoeff(long N, long K)
+        {
+            // This function gets the total number of unique combinations based upon N and K.
+            long r = 1;
+            long d;
+            if (K > N) return 0;
+            for (d = 1; d <= K; d++)
+            {
+                r *= N--;
+                r /= d;
+            }
+            return r;
+        }
+        public static void Permutation(string input, List<string> list)
+        {
+
+            RecPermutation("", input, list);
+        }
+        private static void RecPermutation(string soFar, string input, List<string> list)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                if (!(list.Contains(soFar)))
+                    list.Add(soFar);
+
+                return;
+            }
+            else
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+
+                    string remaining = input.Substring(0, i) + input.Substring(i + 1);
+                    RecPermutation(soFar + input[i], remaining, list);
+                }
+            }
+        }
 }
