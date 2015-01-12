@@ -104,6 +104,10 @@ namespace WaveletTreeRRR
                 StringBuilder bitmapBuilder = new StringBuilder();
                 StringBuilder leftLabel = new StringBuilder();
                 StringBuilder rightLabel = new StringBuilder();
+                int blockSize;
+                int superblockSize;
+                double pom;
+
                 int mid = (currentAlphabet.Count + 1) / 2;
 
                 foreach (char c in currentLabel)
@@ -122,6 +126,14 @@ namespace WaveletTreeRRR
 
 
                 currentNode.setBitmap(bitmapBuilder.ToString());
+
+                blockSize = (int)(Math.Log(currentNode.getBitmap().Length, 2) / 2);
+                superblockSize = (int)(currentNode.RRRTable.BlockSize * Math.Floor(Math.Log(currentNode.getBitmap().Length, 2)));
+                currentNode.RRRTable.BlockSize = blockSize;
+                currentNode.RRRTable.SuperblockSize = superblockSize;
+
+
+
 
                 currentNode.setLeftChild(new WaveletNode());
                 currentNode.getLeftChild().setParent(currentNode);
@@ -192,14 +204,14 @@ namespace WaveletTreeRRR
 
             if (getIndex(character, currentAlphabet) < mid)
             {
-                newIndex = index - countSetBits(currentNode.getBitmap(), index);
+                newIndex = index - popcount(currentNode.getBitmap(), index);
                 currentNode = currentNode.getLeftChild();
                 currentAlphabetSliced = currentAlphabet.GetRange(0, (currentAlphabet.Count - (mid - 1)));
 
             }
             else
             {
-                newIndex = countSetBits(currentNode.getBitmap(), index) - 1;
+                newIndex = popcount(currentNode.getBitmap(), index) - 1;
                 currentNode = currentNode.getRightChild();
                 currentAlphabetSliced = currentAlphabet.GetRange(mid, (currentAlphabet.Count - mid));
             }
@@ -214,7 +226,7 @@ namespace WaveletTreeRRR
             }
         }
 
-        public int countSetBits(String bitmap, int index)
+        public int popcount(String bitmap, int index)
         {
             int counter = 0;
 
@@ -235,6 +247,8 @@ namespace WaveletTreeRRR
     class WaveletNode
     {
         private String bitmap;
+        public RRRDataStructure RRRStruct;
+        public RRRLookupTable RRRTable;
 
         private WaveletNode parent;
         private WaveletNode leftChild;
@@ -280,4 +294,52 @@ namespace WaveletTreeRRR
             return this.parent;
         }
     }
+
+    class RRRDataStructure {
+        private String bitmap; //string that stores class_index,ofset_index pairs
+        private int[] superblockOffset; // offset number--pointer to next superblock(total number of bits until the end of superblock)
+        private int[] superblockSum;  //number of set bits until the end of superblock
+
+        public String Bitmap
+        {
+            get;
+            set;
+        }
+
+        public int[] SuperblockOffset
+        {
+            get;
+            set;
+        }
+
+
+        public int[] SuperblockSum
+        {
+            get;
+            set;
+        }
+    };
+
+
+    class RRRLookupTable {
+        private int blockSize;
+        private int superblockSize;
+        Dictionary<string, List<int>> tableG = new Dictionary<string, List<int>>();
+        private int classBitsNeeded;
+
+        public int BlockSize {
+            get; 
+            set;
+        }
+        public int SuperblockSize {
+            get; 
+            set; 
+        }
+        public int ClassBitsNeeded { 
+            get; 
+            set; 
+        }
+    };
+
+
 }
