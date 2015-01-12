@@ -29,4 +29,9 @@ public class TreeNode<T extends Rankable> implements Rankable {
         }
         return this.data.rank(c, endPos, rootNode);
     }
+
+    @Override
+    public int select(char c, int boundary, TreeNode rootNode) {
+        return this.data.select(c, boundary, rootNode);
+    }
 }

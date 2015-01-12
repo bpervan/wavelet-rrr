@@ -20,10 +20,6 @@ public class BooleanArray implements Rankable {
         this.data = Arrays.copyOf(data, data.length);
     }
 
-    public int select(char c, int count, TreeNode rootNode){
-        return 0;
-    }
-
     @Override
     public int rank(char c, int endPos, TreeNode rootNode){
         TreeNode<BooleanArray> workingNode = rootNode;
@@ -55,9 +51,67 @@ public class BooleanArray implements Rankable {
             }
             rightBound = counter;
             counter = 0;
-            System.out.println("-------------------------------");
         }
         return rightBound;
+    }
+
+    @Override
+    public int select(char c, int boundary, TreeNode rootNode) {
+        TreeNode<BooleanArray> workingNode = rootNode;
+
+        while(true){
+            if(!workingNode.charMap.get(c)){
+                //left
+                if(workingNode.leftChild != null){
+                    workingNode = workingNode.leftChild;
+                } else {
+                    break;
+                }
+            } else {
+                //right
+                if(workingNode.rightChild != null){
+                    workingNode = workingNode.rightChild;
+                } else {
+                    break;
+                }
+            }
+        }
+        //workingNode now contains leaf with char c
+
+        //count 0/1
+        //parent with same operation count -> previously calculated boundary
+        int counter = 0;
+        int newBound = boundary;
+        int Select = 0;
+        while(workingNode != null){
+            if(workingNode.charMap.get(c)){
+                for(int i = 0; i < workingNode.data.data.length; ++i){
+                    Select++;
+                    if(workingNode.data.data[i]){
+                        counter++;
+                        if(counter == newBound){
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for(int i = 0; i < workingNode.data.data.length; ++i){
+                    Select++;
+                    if(!workingNode.data.data[i]){
+                        counter++;
+                        if(counter == newBound){
+                            break;
+                        }
+                    }
+                }
+            }
+            workingNode = workingNode.parent;
+            newBound = Select;
+            counter = 0;
+            Select = 0;
+        }
+
+        return newBound;
     }
 
     @Override

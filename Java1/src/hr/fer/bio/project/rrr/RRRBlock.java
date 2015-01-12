@@ -160,4 +160,54 @@ public class RRRBlock implements Rankable {
         }
         return rightBound;
     }
+
+    @Override
+    public int select(char c, int boundary, TreeNode rootNode) {
+        TreeNode<RRRBlock> workingNode = rootNode;
+
+        while(true){
+            if(!workingNode.charMap.get(c)){
+                //left
+                if(workingNode.leftChild != null){
+                    workingNode = workingNode.leftChild;
+                } else {
+                    break;
+                }
+            } else {
+                //right
+                if(workingNode.rightChild != null){
+                    workingNode = workingNode.rightChild;
+                } else {
+                    break;
+                }
+            }
+        }
+        //working node now contains leaf with char c
+        int counter = 0;
+        int newBound = boundary;
+        int select = 0;
+        while(workingNode != null){
+            int numSuperBlocks = this.arrayLength / this.superblockCapacity;
+            for(int i = 0; i < numSuperBlocks; ++i){
+                select++;
+                counter += workingNode.data.superblockData.get(i);
+                if(counter > newBound){
+                    break;
+                }
+            }
+            //problem s nulama i jedinicama
+            select = select * this.superblockCapacity;
+
+            int numBlocks = this.superblockSize;
+            for(int i = select; i < numBlocks; ++i){
+
+            }
+
+            workingNode = workingNode.parent;
+            newBound = select;
+            select = 0;
+            counter = 0;
+        }
+        return 0;
+    }
 }
