@@ -97,9 +97,9 @@ int main (int argc, char* argv[]) {
         return -1;
     }
 
-    i = calculateNodeMemoryUsage (tree->rootNode);
+    //i = calculateNodeMemoryUsage (tree->rootNode);
 
-    printf ("Memory usage: %d\n", i);
+    //printf ("Memory usage: %d\n", i);
 
     return 0;
 }
