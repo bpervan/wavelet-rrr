@@ -13,6 +13,7 @@ typedef struct {
     BitMap *bitmap;
     int *superblock_offset;
     int *superblock_sum;
+    int superblock_num;
 } RRRStruct;
 
 /** RRRTableEntry is part of the RRRTable.
@@ -51,5 +52,7 @@ RRRStruct *bitmapToRRR (BitMap *bm, RRRTable *global_table);
 /** Function which calculates popcount (number of bits with value 1) from
     the RRR structure */
 int popcountRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table);
+
+int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table);
 
 #endif // RRR_H

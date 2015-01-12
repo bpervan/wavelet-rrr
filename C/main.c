@@ -6,8 +6,8 @@
 int main (int argc, char* argv[]) {
 
     FILE *inputFile = NULL;
-    char* filename, *input;
-    int length = 0, block, superblock, bound, Rank, i;
+    char* filename, *input, *rank_or_select;
+    int length = 0, block, superblock, bound, Rank, Select, i;
     char c, s_char;
     bool header_line = false;
     WaveletTree *tree = NULL;
@@ -16,14 +16,15 @@ int main (int argc, char* argv[]) {
 
     //global_table = (RRRTable *)calloc (1, sizeof(RRRTable));
 
-    if (argc != 4) {
-        printf ("Wrong number of parameters: WavletTree.exe filename char bound expected\n");
+    if (argc != 5) {
+        printf ("Wrong number of parameters: WavletTree.exe filename rank_or_select char bound expected\n");
         return -1;
     }
     /** Arguments input */
     filename = argv[1];
-    s_char = argv[2][0];
-    bound = atoi(argv[3]);
+    rank_or_select = argv[2];
+    s_char = argv[3][0];
+    bound = atoi(argv[4]);
 
     /** Opening input file */
     inputFile = fopen(filename, "r");
@@ -59,15 +60,6 @@ int main (int argc, char* argv[]) {
         return -1;
     }
 
-    /** Calculating block and superblock sizes based on
-        input length */
-    //calculateBlockSizes(length, &block, &superblock);
-
-    /** Creating the RRR table */
-    //buildRRRTable(block, superblock);
-
-    //RRRTableToString();
-
     /** Building the wavelet tree */
     gettimeofday(&start_time,NULL);
     tree = buildWaveletTree(input, length);
@@ -76,32 +68,34 @@ int main (int argc, char* argv[]) {
                        (1000000 * start_time.tv_sec + start_time.tv_usec));
     printf ("Building wavelet tree from input length %d took %ld us\n", length, us);
 
-    /** Counting character occurance directly from input */
-    Rank = 0;
-    gettimeofday(&start_time,NULL);
-    for (i = 0; i < bound; ++i) {
-        if (s_char == input[i]) {
-            Rank++;
-        }
-    }
-    gettimeofday(&end_time,NULL);
-    us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
-                       (1000000 * start_time.tv_sec + start_time.tv_usec));
-    printf ("Expected Rank value is %d\n", Rank);
-    printf ("Counting characters took %ld us\n", us);
-
     free(input);
 
-    /** Calculating rank operation */
-    gettimeofday(&start_time,NULL);
-    Rank = rankOperation(tree, s_char, bound);
-    gettimeofday(&end_time,NULL);
-    us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
-                       (1000000 * start_time.tv_sec + start_time.tv_usec));
+    if (!strcmp (rank_or_select, "rank")) {
+        /** Calculating rank operation */
+        gettimeofday(&start_time,NULL);
+        Rank = rankOperation(tree, s_char, bound);
+        gettimeofday(&end_time,NULL);
+        us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
+                           (1000000 * start_time.tv_sec + start_time.tv_usec));
 
-    /** Result of the rank operation */
-    printf ("Rank(%c, %d) is: %d\n", s_char, bound, Rank);
-    printf ("Calculating rank operation took %ld us\n", us);
+        /** Result of the rank operation */
+        printf ("Rank(%c, %d) is: %d\n", s_char, bound, Rank);
+        printf ("Calculating rank operation took %ld us\n", us);
+    } else if (!strcmp (rank_or_select, "select")) {
+        /** Calculating select operation */
+        gettimeofday(&start_time,NULL);
+        Select = selectOperation(tree, s_char, bound);
+        gettimeofday(&end_time,NULL);
+        us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
+                           (1000000 * start_time.tv_sec + start_time.tv_usec));
+
+        /** Result of the rank operation */
+        printf ("Select(%c, %d) is: %d\n", s_char, bound, Select);
+        printf ("Calculating select operation took %ld us\n", us);
+    } else {
+        printf ("Second argument can be either rank or select\n");
+        return -1;
+    }
 
     i = calculateNodeMemoryUsage (tree->rootNode);
 

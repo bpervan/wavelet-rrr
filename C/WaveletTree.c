@@ -12,6 +12,7 @@ WaveletTree *buildWaveletTree(char* input, int length) {
 
     /** Calling the recursive function which creates tree nodes */
     tree->rootNode = buildWaveletNode(input, length, dict, dictLength);
+    tree->rootNode->parent = NULL;
 
     return tree;
 }
@@ -98,6 +99,7 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         node->leftChild = NULL;
         node->rightChild = buildWaveletNode(secondChildInput, secondChildLength, rightDict, rightDictLength);
 
+        node->rightChild->parent = node;
         free(secondChildInput);
 
     } else {
@@ -136,6 +138,9 @@ WaveletNode *buildWaveletNode (char* input, int length, Dictionary *dict, int di
         /** Recursive call on both children nodes */
         node->leftChild = buildWaveletNode(firstChildInput, firstChildLength, leftDict, leftDictLength);
         node->rightChild = buildWaveletNode(secondChildInput, secondChildLength, rightDict, rightDictLength);
+
+        node->leftChild->parent = node;
+        node->rightChild->parent = node;
 
         free(firstChildInput);
         free(secondChildInput);
@@ -279,6 +284,37 @@ int rankOperation (WaveletTree *tree, char c, int i) {
     }
 
     return Rank;
+}
+
+int selectOperation (WaveletTree *tree, char c, int i) {
+    int Select = i;
+    WaveletNode *nextChild, *current;
+    nextChild = tree->rootNode;
+
+    /** Checking if the character exists in the dictionary */
+    if (!charInDict(tree->rootNode->dict, tree->rootNode->dictLength, c))
+        return -1;
+
+    /** Seacrhing for the leaf node with char c */
+    do {
+        current = nextChild;
+        if (getDictionaryValue(current->dict, current->dictLength, c) == 0) {
+            nextChild = current->leftChild;
+        } else {
+            nextChild = current->rightChild;
+        }
+
+    } while (nextChild != NULL);
+
+    /** Performing select operation */
+    while (current != NULL) {
+        Select = selectRRR (current->rrr, getDictionaryValue(current->dict, current->dictLength, c),
+                            Select, current->table);
+        //printf ("Select: %d", Select);
+        current = current->parent;
+    }
+
+    return Select;
 }
 
 /** Popcount used for counting 1's in bitmap from 0 to i (bitmap is char array) */

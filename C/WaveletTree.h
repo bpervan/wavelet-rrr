@@ -18,6 +18,7 @@ struct WaveletNode {
     int dictLength;
     struct WaveletNode *leftChild;
     struct WaveletNode *rightChild;
+    struct WaveletNode *parent;
 };
 
 typedef struct WaveletNode WaveletNode;
