@@ -30,7 +30,13 @@ public class WaveletTreeBuilder {
         TreeNode<BooleanArray> tempnode = new TreeNode<BooleanArray>(encodeString(string, charMap));
         tempnode.charMap = charMap;
         tempnode.leftChild = fromString(stringDivider(string, charMap)[0], toMap(stringDivider(string, charMap)[0]), min, mid - 1);
-        tempnode.rightChild = fromString(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
+        if(tempnode.leftChild != null) {
+            tempnode.leftChild.parent = tempnode;
+        }
+        if(tempnode.rightChild != null) {
+            tempnode.rightChild = fromString(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
+        }
+        //tempnode.rightChild.parent = tempnode;
         return tempnode;
     }
 
@@ -47,7 +53,13 @@ public class WaveletTreeBuilder {
         TreeNode<RRRBlock> tempnode = new TreeNode<RRRBlock>(encodeStringRRR(string, charMap));
         tempnode.charMap = charMap;
         tempnode.leftChild = fromStringRRR(stringDivider(string, charMap)[0], toMap(stringDivider(string, charMap)[0]), min, mid - 1);
+        if(tempnode.leftChild != null){
+            tempnode.leftChild.parent = tempnode;
+        }
         tempnode.rightChild = fromStringRRR(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
+        if(tempnode.rightChild != null){
+            tempnode.rightChild.parent = tempnode;
+        }
         return tempnode;
     }
     //TEST TEST TEST

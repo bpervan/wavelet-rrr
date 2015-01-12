@@ -20,6 +20,10 @@ public class BooleanArray implements Rankable {
         this.data = Arrays.copyOf(data, data.length);
     }
 
+    public int select(char c, int count, TreeNode rootNode){
+        return 0;
+    }
+
     @Override
     public int rank(char c, int endPos, TreeNode rootNode){
         TreeNode<BooleanArray> workingNode = rootNode;

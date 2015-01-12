@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public class TreeNode<T extends Rankable> implements Rankable {
     protected TreeNode<T> treeRoot;
+    public TreeNode<T> parent;
     public TreeNode<T> leftChild;
     public TreeNode<T> rightChild;
     public T data;
