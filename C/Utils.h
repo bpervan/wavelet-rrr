@@ -24,4 +24,21 @@ typedef struct {
     int length;
 } BitMap;
 
+/** This function is used for extracting different characters from string
+    and storing them in the Dictionary structure */
+Dictionary *extractAlphabet (char *input, int length, int *dictLength);
+
+/** Function which returns true or false based on character value in
+    the dictionary */
+bool getDictionaryValue (Dictionary *dict, int dictLength, char c);
+
+/** Function which checks if the character is in dictionary */
+bool charInDict (Dictionary *dict, int dictLength, char c);
+
+/** Function which is used for creating two dictionaries from one. Those are the
+    dictionaries which are passed to left and right child node */
+void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightDict,
+                      int dictLength, int *leftLength, int *rightLength);
+
+
 #endif // UTILS_H
