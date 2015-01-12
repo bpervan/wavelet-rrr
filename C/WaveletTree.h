@@ -58,6 +58,9 @@ int popcount (char *bitmap, bool c, int i);
 /** Popcount used for counting 1's in bitmap from 0 to i (bitmap is int)*/
 int popcountInt (int bitmap, bool c, int i);
 
+/** Select on bitmap */
+int select(char *bitmap, bool c, int i, int length);
+
 void nodeToString(WaveletNode *node);
 
 /** Function which is used for creating two dictionaries from one. Those are the

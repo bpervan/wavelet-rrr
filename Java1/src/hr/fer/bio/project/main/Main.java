@@ -4,6 +4,7 @@ import hr.fer.bio.project.booleanarray.BooleanArray;
 import hr.fer.bio.project.io.Fasta;
 import hr.fer.bio.project.rrr.RRRBlock;
 import hr.fer.bio.project.wavelet.TreeNode;
+import hr.fer.bio.project.wavelet.WaveletTree;
 import hr.fer.bio.project.wavelet.WaveletTreeBuilder;
 
 import java.io.BufferedReader;
