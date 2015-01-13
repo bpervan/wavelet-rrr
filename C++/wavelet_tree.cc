@@ -44,7 +44,6 @@ WaveletTree* WaveletTree::CreateTreeFromFASTAFile(std::string file) {
 	}
 
 	fin.close();
-	
 	WaveletTree* wt = WaveletTree::CreateTreeFromString(input_string);
 	wt->SetDescription(description);
 	return wt;
@@ -81,8 +80,9 @@ bool WaveletTree::Select(char character, uint32_t appearance, uint32_t& index) {
 	}
 
 	index = root_->GetCharSelect(character, appearance, alphabet_);
+	index++;
 
-	if (index == (length_ + 1)) {
+	if (index == length_) {
 		return false;
 	}
 
