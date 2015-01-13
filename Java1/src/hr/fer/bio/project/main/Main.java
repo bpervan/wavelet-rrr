@@ -65,6 +65,13 @@ public class Main {
                 diff = time2 - time1;
                 resultTime = (double) diff / 1000000000.0;
                 System.out.println("Rank(BooleanArray): " + resultRank + ". Calculated in " + resultTime + " s");
+
+                inOrder(rootNode);
+                System.out.println(mape);
+                System.out.println(lutovi);
+                System.out.println(blokovi);
+                System.out.println(superblokovi);
+                System.out.println(booleanarrayevi);
             } else if(args[1].equals("S")){
                 //Select
                 time1 = System.nanoTime();
@@ -113,14 +120,34 @@ public class Main {
         System.out.println("Over and out");
     }
 
-    private static void inOrder(TreeNode<BooleanArray> rootNode){
+    //Memory analysis
+    //Charmap
+    //RRRRLuT
+    //BooleanArray
+
+    static int mape;
+    static int lutovi;
+    static int blokovi;
+    static int superblokovi;
+    static int booleanarrayevi;
+
+    private static void inOrder(TreeNode<RRRBlock> rootNode){
         if(rootNode == null){
             return;
         }
         inOrder(rootNode.leftChild);
-        printBoolArray(rootNode.data);
-        printHashMap(rootNode.charMap);
-        System.out.println("-----");
+        /*System.out.println("Velicina mape: " + rootNode.charMap.size() + " (Character, Boolean) pairs");
+        System.out.println("Velicina LuT - a" + rootNode.data.table.getTable().size() + " Map<Integer, Map<BooleanArray, Integer>> pairs");
+        System.out.println("Velicina blokova " + rootNode.data.classes.size() + " " + rootNode.data.offsets.size() + " (class, offset) pairs");
+        System.out.println("Velicina superblokova " + rootNode.data.superblockData.size() + " integers");
+        System.out.println("Velicina BooleanArraya " + rootNode.data.booleanArray.data.length + " booleans");
+        System.out.println("-----------------------");*/
+        mape += rootNode.charMap.size();
+        lutovi += rootNode.data.table.getTable().size();
+        blokovi += (rootNode.data.classes.size() * 2);
+        superblokovi += rootNode.data.superblockData.size();
+        booleanarrayevi += rootNode.data.booleanArray.data.length;
+
         inOrder(rootNode.rightChild);
     }
 
