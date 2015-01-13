@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 		cout <<us <<"us" <<endl;
 
 		// Rank operation
-		cout <<"Rank("<<character <<", " <<bound <<"): ";
+		cout <<"Select("<<character <<", " <<bound <<"): ";
 		gettimeofday(&start_time,NULL);
 		success = wt->Select(character, bound, result);
 		gettimeofday(&end_time,NULL);
@@ -91,5 +91,6 @@ int main(int argc, char** argv)
 
 	cout <<"Memory usage: " <<CalculateMemoryUsage(filename, 3, 1, 131072) <<" B" <<endl;
 
+	delete wt;
 	return 0;
 }
