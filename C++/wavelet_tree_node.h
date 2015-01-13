@@ -25,7 +25,9 @@ public:
 	// of string till the index specified as second parameter included
 	virtual uint32_t GetCharRank(char character, uint32_t index, std::string alphabet) = 0;
 
-		virtual uint32_t GetCharSelect(char character, uint32_t n, std::string alphabet) = 0;
+	// Returns index of n-th appearace of character specified by first parameter
+	// where n is second parameter. Returned value is in third parameter.
+	virtual uint32_t GetCharSelect(char character, uint32_t n, std::string alphabet) = 0;
 };
 
 // This class represents internal node in wavelet tree. It contains it's
