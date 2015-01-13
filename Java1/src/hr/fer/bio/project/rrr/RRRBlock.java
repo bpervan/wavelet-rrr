@@ -135,7 +135,7 @@ public class RRRBlock implements Rankable {
                 counter += workingNode.data.classes.get(i);
             }
             int endClass = workingNode.data.classes.get(endBlockPosition);
-            int endOffset = workingNode.data.classes.get(endBlockPosition);
+            int endOffset = workingNode.data.offsets.get(endBlockPosition);
 
             BooleanArray tempArray = null;
             Map<BooleanArray, Integer> tempMap = workingNode.data.table.getTable().get(endClass);
@@ -145,7 +145,7 @@ public class RRRBlock implements Rankable {
                     break;
                 }
             }
-            for(int i = 0; i < (rightBound % workingNode.data.blockSize + 1); ++i){
+            for(int i = 0; i < (rightBound % workingNode.data.blockSize); ++i){
                 if(tempArray.data[i]){
                     counter++;
                 }
@@ -211,14 +211,14 @@ public class RRRBlock implements Rankable {
             //select--;
             //problem s nulama i jedinicama
             select = select * workingNode.data.superblockCapacity;
-            if(counter == newBound){
-                break;
-            }
 
             int index = select / workingNode.data.blockSize;
             int blockCounter = 0;
             int iCache = 0;
             for(int i = index; i < (index + workingNode.data.superblockSize); i += 1){
+                if(counter == newBound){
+                    break;
+                }
                 if(workingNode.charMap.get(c)){
                     blockCounter = workingNode.data.classes.get(i);
                 } else {
@@ -233,9 +233,7 @@ public class RRRBlock implements Rankable {
                     select += workingNode.data.blockSize;
                 }
             }
-            if(counter == newBound){
-                break;
-            }
+
 
             BooleanArray tempArray = null;
             Map<BooleanArray, Integer> block = workingNode.data.table.getTable().get(workingNode.data.classes.get(iCache));
@@ -254,11 +252,9 @@ public class RRRBlock implements Rankable {
                 } else if (!tempArray.data[i] && !workingNode.charMap.get(c)){
                     counter++;
                 }
-
                 select++;
-
             }
-
+            //System.out.println(select);
             workingNode = workingNode.parent;
             newBound = select;
             select = 0;
