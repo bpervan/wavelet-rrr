@@ -10,7 +10,7 @@ RRRTable::~RRRTable() {}
 
 // Returns a table instance through it's parameter
 void RRRTable::GetTable(RRRTable** table) {
-	if (*table == instance_)
+	if ((*table == instance_) && (instance_ != NULL))
 		return;
 
 	counter_++;

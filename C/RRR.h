@@ -53,6 +53,11 @@ RRRStruct *bitmapToRRR (BitMap *bm, RRRTable *global_table);
     the RRR structure */
 int popcountRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table);
 
+/** Performs select operation on RRR bitmap */
 int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table);
+
+/** Function which calculates block's and superblock's sizes based on
+    input string length */
+void calculateBlockSizes (int length, int *block, int *superblock);
 
 #endif // RRR_H

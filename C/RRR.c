@@ -193,6 +193,7 @@ int popcountRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
     }
 }
 
+/** Performs select operation on RRR bitmap */
 int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
     int superblock_index, j, Select, sum = 0, index, class_index, block_sum, k, block;
     int bit = 0, offset = 0, superblock_sum;
@@ -274,6 +275,7 @@ int selectRRR (RRRStruct *rrr, bool c, int i, RRRTable *global_table) {
 
 }
 
+/** Debug function */
 void RRRTableToString (RRRTable *global_table){
     int i, j;
 
@@ -292,5 +294,20 @@ void RRRTableToString (RRRTable *global_table){
         printf ("\n");
     }
 
+}
+
+/** Function which calculates block's and superblock's sizes based on
+    input string length */
+void calculateBlockSizes (int length, int *block, int *superblock) {
+    int log2 = 0, length_pom = length;
+
+    while (length_pom != 0) {
+        length_pom = (length_pom >> 1);
+        log2++;
+    }
+
+    *block = log2 / 2;
+    if (*block == 0) *block = 1;
+    *superblock = *block * log2;
 }
 

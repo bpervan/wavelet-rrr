@@ -50,7 +50,7 @@ bool RRR::AddBlock(uint16_t block, int block_length) {
 	if (!(blocks_.size() % blocks_per_superblock_)) {
 		if (superblocks_.size() == 0) {
 			superblocks_.push_back(popcount);
-		}
+		} 
 		else {
 			superblocks_.push_back(superblocks_[superblocks_.size() - 1] + popcount);
 		}
@@ -124,7 +124,7 @@ uint32_t RRR::Rank1(uint32_t index) {
 	// Determine index of bit inside a block
 	int index_in_block = index % bits_per_block_;
 	uint16_t block = table_->GetBlock(	blocks_[block_index].GetClass(),
-								blocks_[block_index].GetOffset());
+						blocks_[block_index].GetOffset());
 
 	// Iterate through block and count number of bits with value 1 until
 	// bit with given index is reached
@@ -169,7 +169,7 @@ uint32_t RRR::Rank0(uint32_t index) {
 	// Determine index of bit inside a block
 	int index_in_block = index % bits_per_block_;
 	uint16_t block = table_->GetBlock(	blocks_[block_index].GetClass(),
-								blocks_[block_index].GetOffset());
+						blocks_[block_index].GetOffset());
 
 	// Iterate through block and count number of bits with value 0 until
 	// bit with given index is reached
@@ -294,7 +294,7 @@ uint32_t RRR::Select0(uint32_t n) {
 					break;
 				}
 				else if (n >(((middle) * 	bits_per_superblock) -
-																	superblocks_[middle - 1])) {
+						superblocks_[middle - 1])) {
 					superblock_index = middle - 1;
 					break;
 				}
@@ -302,12 +302,12 @@ uint32_t RRR::Select0(uint32_t n) {
 				last = middle;
 			}
 			else {
-				if (n >= ((last + 1 * bits_per_superblock) - superblocks_[last])) {
+				if (n >= (((last + 1) * bits_per_superblock) - superblocks_[last])) {
 					superblock_index = last - 1;
 					break;
 				}
 				else if (n < (((middle + 2) * bits_per_superblock) -
-																			superblocks_[middle + 1])) {
+							superblocks_[middle + 1])) {
 					superblock_index = middle;
 					break;
 				}
@@ -320,7 +320,7 @@ uint32_t RRR::Select0(uint32_t n) {
 		}
 
 		counter =  ((superblock_index + 1) * bits_per_superblock) -
-		 																			superblocks_[superblock_index];
+				superblocks_[superblock_index];
 		block_index = (superblock_index + 1) * blocks_per_superblock_;
 	}
 

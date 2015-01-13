@@ -1,5 +1,6 @@
 package hr.fer.bio.project.rrr;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import hr.fer.bio.project.booleanarray.BooleanArray;
 import hr.fer.bio.project.main.Main;
 import hr.fer.bio.project.rankable.Rankable;
@@ -39,8 +40,11 @@ public class RRRBlock implements Rankable {
             this.blockSize = 1;
         }
         //this.blockSize = 5;
-        this.superblockSize = this.blockSize * RRRLookUpTable.log2(arrayLength);
+        //broj blokova u superbloku
+        //this.superblockSize = this.blockSize * RRRLookUpTable.log2(arrayLength);
+        this.superblockSize = RRRLookUpTable.log2(arrayLength);
         //this.superblockSize = 2;
+        //broj true/false u superbloku
         this.superblockCapacity = superblockSize * blockSize;
 
         classes = new ArrayList<Integer>();
@@ -131,7 +135,7 @@ public class RRRBlock implements Rankable {
                 counter += workingNode.data.classes.get(i);
             }
             int endClass = workingNode.data.classes.get(endBlockPosition);
-            int endOffset = workingNode.data.classes.get(endBlockPosition);
+            int endOffset = workingNode.data.offsets.get(endBlockPosition);
 
             BooleanArray tempArray = null;
             Map<BooleanArray, Integer> tempMap = workingNode.data.table.getTable().get(endClass);
@@ -141,7 +145,7 @@ public class RRRBlock implements Rankable {
                     break;
                 }
             }
-            for(int i = 0; i < (rightBound % workingNode.data.blockSize + 1); ++i){
+            for(int i = 0; i < (rightBound % workingNode.data.blockSize); ++i){
                 if(tempArray.data[i]){
                     counter++;
                 }
@@ -159,5 +163,103 @@ public class RRRBlock implements Rankable {
             counter = 0;
         }
         return rightBound;
+    }
+
+    @Override
+    public int select(char c, int boundary, TreeNode rootNode) {
+        TreeNode<RRRBlock> workingNode = rootNode;
+
+        while(true){
+            if(!workingNode.charMap.get(c)){
+                //left
+                if(workingNode.leftChild != null){
+                    workingNode = workingNode.leftChild;
+                } else {
+                    break;
+                }
+            } else {
+                //right
+                if(workingNode.rightChild != null){
+                    workingNode = workingNode.rightChild;
+                } else {
+                    break;
+                }
+            }
+        }
+        //working node now contains leaf with char c
+        int counter = 0;
+        int newBound = boundary;
+        int select = 0;
+        while(workingNode != null){
+            int numSuperBlocks = workingNode.data.arrayLength / workingNode.data.superblockCapacity;
+            int superblockCounter = 0;
+            for(int i = 0; i < numSuperBlocks; ++i){
+
+                if(workingNode.charMap.get(c)){
+                    superblockCounter += workingNode.data.superblockData.get(i);
+                } else {
+                    superblockCounter += workingNode.data.superblockCapacity - workingNode.data.superblockData.get(i);
+                }
+
+                if(superblockCounter > newBound){
+                    break;
+                } else {
+                    counter = superblockCounter;
+                    select++;
+                }
+            }
+            //select--;
+            //problem s nulama i jedinicama
+            select = select * workingNode.data.superblockCapacity;
+
+            int index = select / workingNode.data.blockSize;
+            int blockCounter = 0;
+            int iCache = 0;
+            for(int i = index; i < (index + workingNode.data.superblockSize); i += 1){
+                if(counter == newBound){
+                    break;
+                }
+                if(workingNode.charMap.get(c)){
+                    blockCounter = workingNode.data.classes.get(i);
+                } else {
+                    blockCounter = workingNode.data.blockSize - workingNode.data.classes.get(i);
+                }
+
+                if(blockCounter + counter > newBound){
+                    iCache = i;
+                    break;
+                } else {
+                    counter += blockCounter;
+                    select += workingNode.data.blockSize;
+                }
+            }
+
+
+            BooleanArray tempArray = null;
+            Map<BooleanArray, Integer> block = workingNode.data.table.getTable().get(workingNode.data.classes.get(iCache));
+            for(Map.Entry<BooleanArray, Integer> entry : block.entrySet()){
+                if(entry.getValue().equals(workingNode.data.offsets.get(iCache))){
+                    tempArray = entry.getKey();
+                    break;
+                }
+            }
+            for(int i = 0; i < tempArray.data.length; ++i){
+                if(counter == newBound){
+                    break;
+                }
+                if(tempArray.data[i] && workingNode.charMap.get(c)){
+                    counter++;
+                } else if (!tempArray.data[i] && !workingNode.charMap.get(c)){
+                    counter++;
+                }
+                select++;
+            }
+            //System.out.println(select);
+            workingNode = workingNode.parent;
+            newBound = select;
+            select = 0;
+            counter = 0;
+        }
+        return newBound;
     }
 }

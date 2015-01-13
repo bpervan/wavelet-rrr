@@ -9,7 +9,7 @@
 /** Structure that represents node in WaveletTree. It contains
     RRR structure (bitmap), a dictionary structure (for encoding
     characters into bits and a pointers to left and right child
-    nodes */
+    nodes and parent node*/
 struct WaveletNode {
     RRRStruct *rrr;
     RRRTable *table;
@@ -36,17 +36,6 @@ WaveletTree *buildWaveletTree (char *input, int length);
 /** Function which is used for creating the tree node */
 WaveletNode *buildWaveletNode (char *input, int length, Dictionary *dict, int dictLenght);
 
-/** This function is used for extracting different characters from string
-    and storing them in the Dictionary structure */
-Dictionary *extractAlphabet (char *input, int length, int *dictLength);
-
-/** Function which returns true or false based on character value in
-    the dictionary */
-bool getDictionaryValue (Dictionary *dict, int dictLength, char c);
-
-/** Function which checks if the character is in dictionary */
-bool charInDict (Dictionary *dict, int dictLength, char c);
-
 /** Function which represents rank operation. Rank (c, i) means
     number of occurances of character c in the first i characters
     of input string */
@@ -59,17 +48,8 @@ int popcount (char *bitmap, bool c, int i);
 int popcountInt (int bitmap, bool c, int i);
 
 /** Select on bitmap */
-int select(char *bitmap, bool c, int i, int length);
+int selectOnBitmap(char *bitmap, bool c, int i, int length);
 
 void nodeToString(WaveletNode *node);
-
-/** Function which is used for creating two dictionaries from one. Those are the
-    dictionaries which are passed to left and right child node */
-void splitDictionary (Dictionary *dict, Dictionary *leftDict, Dictionary *rightDict,
-                      int dictLength, int *leftLength, int *rightLength);
-
-/** Function which calculates block's and superblock's sizes based on
-    input string length */
-void calculateBlockSizes (int length, int *block, int *superblock);
 
 #endif // WAVELETTREE_H

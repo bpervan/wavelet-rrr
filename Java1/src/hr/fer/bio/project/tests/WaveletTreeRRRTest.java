@@ -55,7 +55,7 @@ public class WaveletTreeRRRTest {
 
     @Test
     public void GenericTestCase5() throws Exception {
-        assertEquals(14532, waveletTree.rank('G', 56148, waveletTree));
+        assertEquals(14533, waveletTree.rank('G', 56148, waveletTree));
     }
 
     @Test
@@ -75,12 +75,12 @@ public class WaveletTreeRRRTest {
 
     @Test
     public void GenericTestCase9() throws Exception {
-        assertEquals(0, waveletTree.rank('G', 2, waveletTree));
+        assertEquals(1, waveletTree.rank('G', 2, waveletTree));
     }
 
     @Test
     public void GenericTestCase10() throws Exception {
-        assertEquals(48, waveletTree.rank('T', 158, waveletTree));
+        assertEquals(49, waveletTree.rank('T', 158, waveletTree));
     }
 
     @Test

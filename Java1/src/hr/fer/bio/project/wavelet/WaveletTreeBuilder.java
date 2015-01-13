@@ -33,10 +33,10 @@ public class WaveletTreeBuilder {
         if(tempnode.leftChild != null) {
             tempnode.leftChild.parent = tempnode;
         }
+        tempnode.rightChild = fromString(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
         if(tempnode.rightChild != null) {
-            tempnode.rightChild = fromString(stringDivider(string, charMap)[1], toMap(stringDivider(string, charMap)[1]), mid + 1, max);
+            tempnode.rightChild.parent = tempnode;
         }
-        //tempnode.rightChild.parent = tempnode;
         return tempnode;
     }
 
