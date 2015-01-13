@@ -86,6 +86,8 @@ uint32_t WTInternalNode::GetCharRank(char character, uint32_t index, std::string
 	}
 }
 
+// Returns index of n-th appearace of character specified by first parameter
+// where n is second parameter. Returned value is in third parameter.
 uint32_t WTInternalNode::GetCharSelect(char character, uint32_t n, std::string alphabet) {
 	char limit = alphabet[(alphabet.length() - 1) / 2];
 
@@ -144,6 +146,7 @@ uint32_t WTLeafNode::GetCharRank(char character, uint32_t index, std::string alp
 	return 0;
 }
 
+// Does nothing (it should never be called from leaf node)
 uint32_t WTLeafNode::GetCharSelect(char character, uint32_t index, std::string alphabet) {
 	return 0;
 }

@@ -67,7 +67,8 @@ bool WaveletTree::Rank(char character, uint32_t index, uint32_t& appearance)
 	return true;
 }
 
-//
+// Returns index of n-th appearace of character specified by first parameter
+// where n is second parameter. Returned value is in third parameter.
 bool WaveletTree::Select(char character, uint32_t appearance, uint32_t& index) {
 	if ((appearance >= length_)|| (appearance == 0) || (alphabet_.find(character) == std::string::npos)){
 		index = length_ + 1;

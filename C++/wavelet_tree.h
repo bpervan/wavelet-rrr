@@ -31,7 +31,8 @@ public:
 	// Method returns true if succeeded, false otherwise
 	bool Rank(char character, uint32_t index, uint32_t& appearance);
 
-	// 
+	// Returns index of n-th appearace of character specified by first parameter
+	// where n is second parameter. Returned value is in third parameter.
 	bool Select(char character, uint32_t appearance, uint32_t& index);
 
 	// Returns character of a string on given index
