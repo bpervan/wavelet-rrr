@@ -25,35 +25,66 @@ public class Main {
      * 2. java hr.fer.bio.project.main.Main pathToFastaFile character endPosition
      * */
     public static void main(String[] args) throws IOException{
-        if(args.length < 1 || args.length > 3){
+        if(args.length < 1 || args.length > 4){
             System.out.println("Arguments?");
+            System.out.println("java hr.fer.bio.project.main FileName (R|S) Character EndBound");
             System.exit(-1);
         }
 
         Fasta inputGenome = Fasta.fromFile(args[0]);
         long time1 = System.nanoTime();
         TreeNode<RRRBlock> rootNode = WaveletTreeBuilder.getInstance().fromStringRRR(inputGenome.getReadings());
-        TreeNode<BooleanArray> rootNode2 = WaveletTreeBuilder.getInstance().fromString(inputGenome.getReadings());
         long time2 = System.nanoTime();
-        System.out.println("Wavelet tree with RRR nodes created in " + (time2 - time1) + " ns");
+        long diff = time2 - time1;
+        double resultTime = (double) diff / 1000000000.0;
+        System.out.println("Wavelet tree with RRR nodes created in " + resultTime + " s");
 
-        System.out.println(rootNode.rank('t', 4000000, rootNode));
-        System.out.println(rootNode.select('a', 40000, rootNode));
-        System.out.println(rootNode.rank('a', 543210, rootNode));
-        System.out.println(rootNode.select('c', 543210, rootNode));
 
-        System.out.println(rootNode2.rank('t', 4000000, rootNode2));
-        System.out.println(rootNode2.select('a', 40000, rootNode2));
-        System.out.println(rootNode2.rank('a', 543210, rootNode2));
-        System.out.println(rootNode2.select('c', 543210, rootNode2));
-        System.exit(0);
+        time1 = System.nanoTime();
+        TreeNode<BooleanArray> rootNodeBooleanArray = WaveletTreeBuilder.getInstance().fromString(inputGenome.getReadings());
+        time2 = System.nanoTime();
+        diff = time2 - time1;
+        resultTime = (double) diff / 1000000000.0;
+        System.out.println("Wavelet tree with BooleanArray nodes created in " + resultTime + " s");
 
         int resultRank;
-        if(args.length == 3){
-            time1 = System.nanoTime();
-            resultRank = rootNode.rank(args[2].charAt(0), Integer.parseInt(args[3]), rootNode);
-            time2 = System.nanoTime();
-            System.out.println("Rank: " + resultRank + ". Calculated in " + (time2 - time1) + " ns");
+        int resultSelect;
+        if(args.length == 4){
+            if(args[1].equals("R")){
+                //Rank
+                time1 = System.nanoTime();
+                resultRank = rootNode.rank(args[2].charAt(0), Integer.parseInt(args[3]), rootNode);
+                time2 = System.nanoTime();
+                diff = time2 - time1;
+                resultTime = (double) diff / 1000000000.0;
+                System.out.println("Rank(RRR): " + resultRank + ". Calculated in " + resultTime + " s");
+
+                time1 = System.nanoTime();
+                resultRank = rootNodeBooleanArray.rank(args[2].charAt(0), Integer.parseInt(args[3]), rootNodeBooleanArray);
+                time2 = System.nanoTime();
+                diff = time2 - time1;
+                resultTime = (double) diff / 1000000000.0;
+                System.out.println("Rank(BooleanArray): " + resultRank + ". Calculated in " + resultTime + " s");
+            } else if(args[1].equals("S")){
+                //Select
+                time1 = System.nanoTime();
+                resultRank = rootNode.select(args[2].charAt(0), Integer.parseInt(args[3]), rootNode);
+                time2 = System.nanoTime();
+                diff = time2 - time1;
+                resultTime = (double) diff / 1000000000.0;
+                System.out.println("Select(RRR): " + resultRank + ". Calculated in " + resultTime + " s");
+
+                time1 = System.nanoTime();
+                resultRank = rootNodeBooleanArray.select(args[2].charAt(0), Integer.parseInt(args[3]), rootNodeBooleanArray);
+                time2 = System.nanoTime();
+                diff = time2 - time1;
+                resultTime = (double) diff / 1000000000.0;
+                System.out.println("Select(BooleanArray): " + resultRank + ". Calculated in " + resultTime + " s");
+            } else {
+                System.out.println("R or S");
+                System.exit(-1);
+            }
+
         } else if(args.length == 1){
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
