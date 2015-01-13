@@ -5,12 +5,13 @@
 #include <stdint.h>
 
 #include "wavelet_tree.h"
+#include "memory_usage.h"
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-	
+
 	struct timeval start_time, end_time;
 	char rank_or_select, character;
 	string filename;
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 		}
 		else {
 			cout <<"Failed. Wrong index" <<endl;
-		}	
+		}
 	}
 	else if (rank_or_select == 'S') {
 		// Creating wavelet tree
@@ -76,7 +77,7 @@ int main(int argc, char** argv)
 
 		us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
         	(1000000 * start_time.tv_sec + start_time.tv_usec));
-		
+
 		if (success) {
 			cout <<result <<" [" <<us <<" us]" <<endl;
 		}
@@ -86,7 +87,9 @@ int main(int argc, char** argv)
 	}
 	else {
 		cout <<"Value of 3rd parameter must be 'R' or 'S'" <<endl;
-	}		
+	}
+
+	cout <<"Memory usage: " <<CalculateMemoryUsage(filename, 3, 1, 131072) <<" B" <<endl;
 
 	return 0;
 }
