@@ -52,9 +52,7 @@ void WTInternalNode::SetRightChild(WTNode* node) {
 
 // Recursive method which returns number of appereance of specified character
 // from beginning till the specified index
-uint32_t WTInternalNode::GetCharRank(	char character,
-																			uint32_t index,
-																			std::string alphabet) {
+uint32_t WTInternalNode::GetCharRank(char character, uint32_t index, std::string alphabet) {
 	if (alphabet.length() == 2) {
 		if (character == alphabet[0]) {
 			return rrr_sequence_->Rank0(index);
@@ -74,8 +72,7 @@ uint32_t WTInternalNode::GetCharRank(	char character,
 				(alphabet.substr(0, ((alphabet.length() - 1) / 2) + 1).length() == 1))
 			return rank;
 		else
-			return left_->GetCharRank(character, rank - 1,
-																alphabet.substr(0, ((alphabet.length() - 1) / 2) + 1));
+			return left_->GetCharRank(character, rank - 1, alphabet.substr(0, ((alphabet.length() - 1) / 2) + 1));
 	}
 	else {
 		uint32_t rank = rrr_sequence_->Rank1(index);
@@ -86,6 +83,40 @@ uint32_t WTInternalNode::GetCharRank(	char character,
 		else
 			return right_->GetCharRank (
 			character, rank - 1, alphabet.substr(((alphabet.length() - 1) / 2) + 1));
+	}
+}
+
+uint32_t WTInternalNode::GetCharSelect(char character, uint32_t n, std::string alphabet) {
+	char limit = alphabet[(alphabet.length() - 1) / 2];
+
+	if (n == 3)
+	{
+		n = n;
+	}
+
+	if (character <= limit) {
+		std::string left_substr = alphabet.substr(0, ((alphabet.length() - 1) / 2) + 1);
+
+		if (left_substr.length() == 1) {
+			return rrr_sequence_->Select0(n);
+		}
+		else
+		{
+			n = left_->GetCharSelect(character, n, left_substr);
+			return rrr_sequence_->Select0(++n);
+		}
+	}
+	else {
+		std::string right_substr = alphabet.substr(((alphabet.length() - 1) / 2) + 1);
+
+		if (right_substr.length() == 1) {
+			return rrr_sequence_->Select1(n);
+		}
+		else
+		{
+			n = right_->GetCharSelect(character, n, right_substr);
+			return rrr_sequence_->Select1(++n);
+		}
 	}
 }
 
@@ -109,8 +140,11 @@ void WTLeafNode::SetLeftChild(WTNode* node) {}
 void WTLeafNode::SetRightChild(WTNode* node) {}
 
 // Does nothing (it should never be called from leaf node)
-uint32_t WTLeafNode::GetCharRank(	char character,
-																	uint32_t index,
-																	std::string alphabet) {
+uint32_t WTLeafNode::GetCharRank(char character, uint32_t index, std::string alphabet) {
 	return 0;
 }
+
+uint32_t WTLeafNode::GetCharSelect(char character, uint32_t index, std::string alphabet) {
+	return 0;
+}
+

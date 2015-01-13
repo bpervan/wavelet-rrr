@@ -26,9 +26,13 @@ public:
 	// Returns a wavelet tree created from sequence in FASTA file
 	static WaveletTree* CreateTreeFromFASTAFile(std::string file);
 
-	// Returns a number of appearance of a given character from beginning of
-	// a string till the given index included
-	uint32_t Rank(char character, uint32_t index);
+	// Returns number of appearance of  given character from beginning of
+	// the string till the given index included through it's last parametar.
+	// Method returns true if succeeded, false otherwise
+	bool Rank(char character, uint32_t index, uint32_t& appearance);
+
+	// 
+	bool Select(char character, uint32_t appearance, uint32_t& index);
 
 	// Returns character of a string on given index
 	char GetCharAt(uint32_t index);

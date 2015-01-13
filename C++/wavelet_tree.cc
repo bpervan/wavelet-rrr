@@ -52,9 +52,41 @@ WaveletTree* WaveletTree::CreateTreeFromFASTAFile(std::string file) {
 
 // Returns a number of appearance of a given character from beginning of
 // a string till the given index included
-uint32_t WaveletTree::Rank(char character, uint32_t index)
+bool WaveletTree::Rank(char character, uint32_t index, uint32_t& appearance)
 {
-	return root_->GetCharRank(character, index, alphabet_);
+	if ((index >= length_) || (alphabet_.find(character) == std::string::npos)){
+		appearance = length_ + 1;
+		return false;
+	}
+
+	if (alphabet_.length() == 1) {
+		appearance = index;
+		return true;
+	}
+
+	appearance = root_->GetCharRank(character, index, alphabet_);
+	return true;
+}
+
+//
+bool WaveletTree::Select(char character, uint32_t appearance, uint32_t& index) {
+	if ((appearance >= length_)|| (appearance == 0) || (alphabet_.find(character) == std::string::npos)){
+		index = length_ + 1;
+		return false;
+	}
+
+	if (alphabet_.length() == 1) {
+		index = appearance - 1;
+		return true;
+	}
+
+	index = root_->GetCharSelect(character, appearance, alphabet_);
+
+	if (index == (length_ + 1)) {
+		return false;
+	}
+
+	return true;
 }
 
 // Returns character of a string on given index

@@ -302,7 +302,7 @@ uint32_t RRR::Select0(uint32_t n) {
 				last = middle;
 			}
 			else {
-				if (n >= ((last + 1 * bits_per_superblock) - superblocks_[last])) {
+				if (n >= (((last + 1) * bits_per_superblock) - superblocks_[last])) {
 					superblock_index = last - 1;
 					break;
 				}

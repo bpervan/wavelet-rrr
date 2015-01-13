@@ -24,6 +24,8 @@ public:
 	// Returns number of appearance of character given as parameter from beggining
 	// of string till the index specified as second parameter included
 	virtual uint32_t GetCharRank(char character, uint32_t index, std::string alphabet) = 0;
+
+		virtual uint32_t GetCharSelect(char character, uint32_t n, std::string alphabet) = 0;
 };
 
 // This class represents internal node in wavelet tree. It contains it's
@@ -37,6 +39,7 @@ public:
 	virtual void SetLeftChild(WTNode* node);
 	virtual void SetRightChild(WTNode* node);
 	virtual uint32_t GetCharRank(char character, uint32_t index, std::string alphabet);
+	virtual uint32_t GetCharSelect(char character, uint32_t n, std::string alphabet);
 
 private:
 	// RRR sequence
@@ -60,6 +63,7 @@ public:
 	virtual void SetLeftChild(WTNode* node);
 	virtual void SetRightChild(WTNode* node);
 	virtual uint32_t GetCharRank(char character, uint32_t index, std::string alphabet);
+	virtual uint32_t GetCharSelect(char character, uint32_t n, std::string alphabet);
 
 private:
 	// Character
