@@ -238,6 +238,36 @@ namespace WaveletTree
             return rank;
         }
 
+        public int CalculateSelectDummy(int value)
+        {
+            var array = _bitArray;
+            int sum = 0;
+            for (int i = 0; i <= array.Count; i++)
+            {
+                if (array[i] == true)
+                    sum++;
+                if (sum == value)
+                    return i;
+            }
+
+            return 0;
+        }
+
+        public int CalculateSelectDummyZero(int value)
+        {
+            var array = _bitArray;
+            int sum = 0;
+            for (int i = 0; i <= array.Count; i++)
+            {
+                if (array[i] == false)
+                    sum++;
+                if (sum == value)
+                    return i;
+            }
+
+            return 0;
+        }
+
         public int CalculateRank(int position)
         {
 
@@ -318,6 +348,174 @@ namespace WaveletTree
                     sum = sum + (int)(Math.Pow(2, array.Count - 1 - i));
             }
             return sum;
+        }
+
+        public int CalculateSelect(int value)
+        {
+            int rez = 0;
+            int offset = 0;
+            int index = 0;
+            int sum = 0;
+            int StartPosition = 0;
+            for (int i = 0; i < _superBlocks.Count(); i++)
+                if (_superBlocks[i].Item1 >= value)
+                {
+                    if (i > 0)
+                    {
+                        rez = i * _superBlockLength * _blockLength;
+                        StartPosition = _superBlocks[i - 1].Item2;
+                        sum += _superBlocks[i - 1].Item1;
+                    }
+                    else
+                        rez = 0;
+                    index = i;
+                    break;
+                }
+
+
+            //int offset = 0;
+            while(true)
+            {
+                var blockClassBits = _blocksInfo.GetRange(StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+                //var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+                var blockClass = ArrayToInt(blockClassBits);
+                if (sum + blockClass >= value)
+                {
+                    break;
+                }
+                else
+                {
+                    sum += blockClass;
+                    rez += _blockLength;
+                    offset = offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1;
+                    var permutationsListSize = GetPermutations(blockClass).Count();
+                    int bitsNeeded;
+                    if (permutationsListSize != 1)
+                        bitsNeeded = (int)Math.Floor(Math.Log(permutationsListSize - 1, 2)) + 1;
+                    else bitsNeeded = 1;
+                    offset = offset + bitsNeeded;
+                }
+            }
+            var blockClassBitsFinal = _blocksInfo.GetRange(StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+            //var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+            var blockClassFinal = ArrayToInt(blockClassBitsFinal);
+
+            var permutationsListSizeFinal = GetPermutations(blockClassFinal).Count();
+            int bitsNeededFinal;
+            if (permutationsListSizeFinal != 1)
+                bitsNeededFinal = (int)Math.Floor(Math.Log(permutationsListSizeFinal - 1, 2)) + 1;
+            else bitsNeededFinal = 1;
+            var permutationIndexArrayFinal = _blocksInfo.GetRange(offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
+            //var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
+            var permutationIndex = ArrayToInt(permutationIndexArrayFinal);
+            //return GetPermutations(blockClass)[permutationIndex].Item2;
+
+
+
+            var permutationList = GetPermutations(blockClassFinal);
+            var permutationCumulative = permutationList[permutationIndex].Item2;
+            var position = permutationCumulative.IndexOf(value - sum);
+            rez += position;
+
+
+
+
+            return rez;
+        }
+
+        public int CalculateSelectZero(int value)
+        {
+            int rez = 0;
+            int offset = 0;
+            int index = 0;
+            int sum = 0;
+            int StartPosition = 0;
+            for (int i = 0; i < _superBlocks.Count(); i++)
+                if (((i + 1) * _superBlockLength * _blockLength) -  _superBlocks[i].Item1 >= value)
+                {
+                    if (i > 0)
+                    {
+                        rez = i * _superBlockLength * _blockLength;
+                        StartPosition = _superBlocks[i - 1].Item2;
+                        sum += ((i) * _superBlockLength * _blockLength) - _superBlocks[i - 1].Item1;
+                    }
+                    else
+                        rez = 0;
+                    index = i;
+                    break;
+                }
+
+
+            //int offset = 0;
+            while (true)
+            {
+                var blockClassBits = _blocksInfo.GetRange(StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+                //var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+                var blockClass = ArrayToInt(blockClassBits);
+                if (sum + (_blockLength - blockClass) >= value)
+                {
+                    break;
+                }
+                else
+                {
+                    sum = sum + (_blockLength - blockClass);
+                    rez += _blockLength;
+                    offset = offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1;
+                    var permutationsListSize = GetPermutations(blockClass).Count();
+                    int bitsNeeded;
+                    if (permutationsListSize != 1)
+                        bitsNeeded = (int)Math.Floor(Math.Log(permutationsListSize - 1, 2)) + 1;
+                    else bitsNeeded = 1;
+                    offset = offset + bitsNeeded;
+                }
+            }
+            var blockClassBitsFinal = _blocksInfo.GetRange(StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+            //var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+            var blockClassFinal = ArrayToInt(blockClassBitsFinal);
+
+            var permutationsListSizeFinal = GetPermutations(blockClassFinal).Count();
+            int bitsNeededFinal;
+            if (permutationsListSizeFinal != 1)
+                bitsNeededFinal = (int)Math.Floor(Math.Log(permutationsListSizeFinal - 1, 2)) + 1;
+            else bitsNeededFinal = 1;
+            var permutationIndexArrayFinal = _blocksInfo.GetRange(offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
+            //var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
+            var permutationIndex = ArrayToInt(permutationIndexArrayFinal);
+            //return GetPermutations(blockClass)[permutationIndex].Item2;
+
+
+
+            var permutationList = GetPermutations(blockClassFinal);
+            var permutationCumulative = permutationList[permutationIndex].Item2;
+            //var position = permutationCumulative.IndexOf(_blockLength - (value - sum));
+            int tempSum = 0;
+            int position = 0;
+            for (int i = 0; i < permutationCumulative.Count(); i++)
+            {
+                if (i > 0)
+                {
+                    if (permutationCumulative[i] == permutationCumulative[i - 1])
+                        tempSum++;
+                }
+                else
+                    if (permutationCumulative[i] == 0)
+                        tempSum++;
+
+
+                if (tempSum + sum == value)
+                {
+                    position = i;
+                    break;
+                }
+            }
+
+
+            rez += position;
+
+
+
+
+            return rez;
         }
 
 

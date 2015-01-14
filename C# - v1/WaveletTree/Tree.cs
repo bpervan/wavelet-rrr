@@ -201,6 +201,53 @@ namespace WaveletTree
             return result;
         }
 
+        public int GetSelect(char letter, int position)
+        {
+            if (!this._sortedChars.Contains(letter))
+            {
+                return 0;
+            }
+            if (this._sortedChars.Count() < 3) //leaf
+            {
+                var select = 0;
+                if (GoesLeft(letter))
+                {
+                    if (Text.Count() > 3)
+                        select = rrrStruct.CalculateSelectZero(position);
+                    else
+                        select = this.CalculateSelectDummyZero(position);
+                }
+                else 
+                {
+                    if (Text.Count() > 3)
+                        select = rrrStruct.CalculateSelect(position);
+                    else
+                        select = this.CalculateSelectDummy(position);               
+                }
+                return select;
+            }
+            else
+            {
+                var childResult = this.leftNode.GetSelect(letter, position) + this.rightNode.GetSelect(letter, position);
+                var select = 0;
+                if (GoesLeft(letter) == false)
+                {
+                    if (Text.Count() > 3)
+                        select = rrrStruct.CalculateSelectZero(childResult);
+                    else
+                        select = this.CalculateSelectDummyZero(childResult);
+                }
+                else
+                {
+                    if (Text.Count() > 3)
+                        select = rrrStruct.CalculateSelect(childResult);
+                    else
+                        select = this.CalculateSelectDummy(childResult);             
+                }
+                return select;
+            }
+        }
+
         public int CalculateRankDummy(int positition)
         {
             var array = _bitArrayText;
@@ -210,6 +257,36 @@ namespace WaveletTree
                     rank++;
 
             return rank;
+        }
+
+        public int CalculateSelectDummy(int value)
+        {
+            var array = _bitArrayText;
+            int sum = 0;
+            for (int i = 0; i <= array.Count; i++)
+            {
+                if (array[i] == true)
+                    sum++;
+                if (sum == value)
+                    return i;
+            }
+
+            return 0;
+        }
+
+        public int CalculateSelectDummyZero(int value)
+        {
+            var array = _bitArrayText;
+            int sum = 0;
+            for (int i = 0; i <= array.Count; i++)
+            {
+                if (array[i] == false)
+                    sum++;
+                if (sum == value)
+                    return i;
+            }
+
+            return 0;
         }
     }
 }
