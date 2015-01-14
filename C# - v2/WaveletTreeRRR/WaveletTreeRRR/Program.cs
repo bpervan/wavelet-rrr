@@ -14,28 +14,15 @@ namespace WaveletTreeRRR
         {
             try
             {
-                Console.Write("\nMemory used on start od program: " + GC.GetTotalMemory(false) + "bytes\n");
+               
                 new WaveletTreeRRR(args);
-                Console.Write("Memory used: " + GC.GetTotalMemory(false) + "bytes\n");
+            
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
-
-
         }
-        static int mapsize;
-
-       /* public static void inOrder(TreeNode rootNode) 
-        {
-            if (rootNode == null)
-                return;
-            inOrder(rootNode.left);
-            mapsize = mapsize + rootNode.map.size();
-            inOrder(rootNode.right);
-        }*/
-
     }
 }
