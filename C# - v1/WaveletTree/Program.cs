@@ -23,7 +23,6 @@ namespace WaveletTree
             int position = 1000000; */
 
 
-
             string text;
             text = System.IO.File.ReadAllText(fileName);
             text = text.Substring(text.IndexOf(System.Environment.NewLine) + System.Environment.NewLine.Count());
