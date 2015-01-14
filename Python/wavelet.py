@@ -7,6 +7,8 @@ import math
 #citamo niz i stvaramo abecedu, neka petlja koja cita znak po 		#znak i uzima razlicite, dijeli po pola (length -1) i desni 1 
 	# i lijevi 0 te ta dva niza svaki poziva rekurzivno funkciju
 #sad trebam napravit abecedu
+
+#stvorimo lookup
 def CreateLookUp():
 	helperDict = {}
 	BlockSize = 5
@@ -33,7 +35,7 @@ def PopCount(Bitmap, boundary, cond):
 			counter = counter + 1
 			
 	return counter
-
+#prva verzija rrr radi
 def CreateRRR(nodekey,preRRR):
 	
 	lenghtsize = len(preRRR) % 5
@@ -87,6 +89,7 @@ def MakeBranch():
 	right = []
 	return
 
+#funkcija koja iz ulaznog niza stvara valic drvo
 def InitTree(niz):
 		
 	words = re.findall('[A-Z]+', niz.upper())	
