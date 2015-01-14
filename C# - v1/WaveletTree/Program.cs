@@ -12,52 +12,67 @@ namespace WaveletTree
     {
         static void Main(string[] args)
         {
-            //var rrr = new RRRStruct("0010100110101101000001001010011011000101101101");
-            var rrr = new RRRStruct(new BitArray(new bool[]{false,false, true,false, true, false, true, true, true, false,
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true, 
-                false,false, true,false, true, false, true, true, true,
-                false,false, true,false, true, false, true, true, true
-            }));
-            var n = rrr.WordLength;
-            var blocklength = rrr.BlockLength;
-            var superblleng = rrr.SuperBlockLength;
-            var bl = rrr.Blocks;
-            var bi = rrr.BlocksInfo;
-            var sb = rrr.SuperBlocks;
+            //string fileName = args[0];
+            //char inputChar = args[1][0];
+            //int position = Convert.ToInt32(args[2]);
+            int position = 123456;
+            char inputChar = 'G';
 
-            for (int i = 0; i < rrr.WordLength; i++)
+            //Console.WriteLine(fileName);
+            //Console.WriteLine(inputChar);
+            //Console.WriteLine(position);
+
+            //todo better fasta recoignition
+
+            bool fasta = false;
+            //if (fileName.Split('.')[1] == "fa" || fileName.Split('.')[1] == "fas")
+            //    fasta = true;
+
+            string text;
+            text = System.IO.File.ReadAllText("input1.fa");
+            text = text.Substring(text.IndexOf(System.Environment.NewLine) + 2);
+            //if (fasta)
+            //{
+            //    text = System.IO.File.ReadAllText(fileName);
+            //    text = text.Substring(text.IndexOf(System.Environment.NewLine) + 2);
+            //    //Console.WriteLine(text.IndexOf(System.Environment.NewLine));
+            //}
+            //else
+            //{
+            //    text = System.IO.File.ReadAllText(fileName);
+            //}
+            //Console.WriteLine(text);
+
+            string newString = text.Replace(System.Environment.NewLine, "");
+
+            //Console.WriteLine(newString.Count());
+
+            System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch st1 = new System.Diagnostics.Stopwatch();
+
+
+
+
+            
+           
+            var tree = new Tree(newString);
+            st.Start();
+            var rank = tree.GetRank(inputChar, position);
+            st.Stop();
+            var elap = st.ElapsedMilliseconds;
+            var rankDummy = 0;
+            st1.Start();            
+            for (int i = 0; i <= position; i++ )
             {
-                var tmp = rrr.CalculateRank(i);
-                var tmp1 = rrr.CalculateRankDummy(i);
-                if (tmp != tmp1)
-                {
-                    Console.Write("Failed at: ");
-                    Console.WriteLine(i);
-                    return;
-                }
+                if (newString[i] == inputChar)
+                    rankDummy++;
             }
-            Console.WriteLine("OK");
-            //Console.ReadLine();
-
-            var tree = new Tree("Three Swedish switched witches watch three Swiss Swatch watch switches. Which Swedish switched witch watch which Swiss Swatch watch switch?");
-            var rank = tree.GetRank('e', 138);
+            st1.Stop();
+            var el = st1.ElapsedMilliseconds;
+            Console.WriteLine(rank);
+            Console.Write(rankDummy);
+            //Console.Write(newString);
+            
 
         }
 

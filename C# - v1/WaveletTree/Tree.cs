@@ -20,6 +20,8 @@ namespace WaveletTree
                 _text = text;
                 string leftText = "";
                 string rightText = "";
+                _bitArrayText.Length = text.Count();
+                int bitsAdded = 0;
                 if (text.Count() < 4)
                 {
                     foreach (var chr in text)
@@ -28,41 +30,54 @@ namespace WaveletTree
                         {
                             leftText = leftText + chr.ToString();
                             _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, false);
+                            _bitArrayText.Set(bitsAdded, false);
                         }
                         else
                         {
                             rightText = rightText + chr.ToString();
                             _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, true);
+                            _bitArrayText.Set(bitsAdded, true);
                         }
+                        bitsAdded++;
                     }
                 }
                 else
                 {
+                    //int h = 0;
+                    var leftStringBuilder = new StringBuilder();
+                    var rightStringBuilder = new StringBuilder();
                     foreach (var chr in text)
                     {
+                        //h++;
+                        //if (h % 10000 == 0)
+                        //    Console.WriteLine(h);
                         if (GoesLeft(chr))
                         {
-                            leftText = leftText + chr.ToString();
-                            _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, false);
+                            leftStringBuilder.Append(chr);
+                            //leftText.Insert(leftText.Count(), chr.ToString());
+                            //leftText = leftText + chr.ToString();
+                            _bitArrayText.Set(bitsAdded, false);
                         }
                         else
                         {
-                            rightText = rightText + chr.ToString();
-                            _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, true);
+                            rightStringBuilder.Append(chr);
+                            //rightText.Insert(rightText.Count(), chr.ToString());
+                            //rightText = rightText + chr.ToString();
+                            _bitArrayText.Set(bitsAdded, true);
                         }
+                        bitsAdded++;
                     }
+                    leftText = leftStringBuilder.ToString();
+                    rightText = rightStringBuilder.ToString();
                     rrrStruct = new RRRStruct(_bitArrayText);
                 }
-
                 leftNode = new Tree(leftText);
                 rightNode = new Tree(rightText);
             }
             else
             {
+                int bitsAdded = 0;
+                _bitArrayText.Length = text.Count();
                 _text = text;
                 if (text.Count() < 4)
                 {
@@ -82,18 +97,26 @@ namespace WaveletTree
                 }
                 else
                 {
+                    //int h = 0;
                     foreach (var chr in text)
                     {
+                        //h++;
+                        //if (h % 10000 == 0)
+                        //    Console.WriteLine(h);
                         if (GoesLeft(chr))
                         {
-                            _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, false);
+                            //leftText = leftText + chr.ToString();
+                            _bitArrayText.Set(bitsAdded, false);
+                            //_bitArrayText.Length = _bitArrayText.Length + 1;
+                            //_bitArrayText.Set(_bitArrayText.Length - 1, false);
                         }
                         else
                         {
-                            _bitArrayText.Length = _bitArrayText.Length + 1;
-                            _bitArrayText.Set(_bitArrayText.Length - 1, true);
+                            _bitArrayText.Set(bitsAdded, true);
+                            //_bitArrayText.Length = _bitArrayText.Length + 1;
+                            //_bitArrayText.Set(_bitArrayText.Length - 1, true);
                         }
+                        bitsAdded++;
                     }
                     rrrStruct = new RRRStruct(_bitArrayText);
                 }
@@ -121,7 +144,8 @@ namespace WaveletTree
 
         private void SortChars(string str)
         {
-            _sortedChars = String.Concat(str.OrderBy(c => c)).Distinct().ToList();
+            _sortedChars = str.Distinct().OrderBy(c => c).ToList();
+            //_sortedChars = String.Concat(str.OrderBy(c => c)).Distinct().ToList();
         }
 
         private bool GoesLeft(char chr)
@@ -134,7 +158,7 @@ namespace WaveletTree
 
         public int GetRank(char letter, int position)
         {
-            
+
             int result = 0;
             bool direction;
             if (GoesLeft(letter))

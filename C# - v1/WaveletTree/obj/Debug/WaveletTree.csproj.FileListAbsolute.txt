@@ -1,6 +1,6 @@
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.exe.config
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.exe
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.pdb
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.csprojResolveAssemblyReference.cache
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.exe
-c:\users\vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.pdb
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.exe.config
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.exe
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\bin\Debug\WaveletTree.pdb
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.exe
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.pdb
+C:\Users\Vlado\documents\visual studio 2013\Projects\WaveletTree\WaveletTree\obj\Debug\WaveletTree.csprojResolveAssemblyReference.cache
