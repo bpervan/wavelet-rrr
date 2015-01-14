@@ -11,7 +11,7 @@ namespace WaveletTree
     {
         public RRRStruct(List<bool> bitArray)
         {
-            _bitArray = new List<bool>(bitArray); //TODO je ovo pametno?
+            _bitArray = new List<bool>(bitArray); 
             _wordLength = _bitArray.Count;
             _blockLength = (int)Math.Floor(Math.Log(_wordLength, 2) / 2);
             var lastBlockBitCount = bitArray.Count % this._blockLength;
@@ -19,7 +19,6 @@ namespace WaveletTree
             {
                 for (int i = 0; i < _blockLength - lastBlockBitCount; i++ )
                     _bitArray.Add(false);
-                //_bitArray = AppendArray(_bitArray, new List<bool>(_blockLength - lastBlockBitCount, false));
             }
 
 
@@ -64,17 +63,18 @@ namespace WaveletTree
                 tmp++;
                 if (tmp % 10000 == 0)
                     Console.WriteLine(tmp);
+
                 blockCount++;
                 var rank = GetRank(block);
-                //var rankArray = new List<bool>(new int[] { rank });
-                var rankArray = Convert.ToString(rank, 2).PadLeft((int)Math.Floor(Math.Log(_blockLength, 2)) + 1,'0').ToList();
+                var rankArray = Convert.ToString(rank, 2).PadLeft((int)Math.Floor(Math.Log(_blockLength, 2)) + 1, '0').ToList();
                 var rankArrayCoverted = rankArray.Select(chr => chr == '1').ToList();
-                var permutations = GetPermutations(rank);
-                var index = permutations.FindIndex(t => ArrayMatch(block, t.Item1));
+                //var permutations = GetPermutations(rank);
+                var index = GetPermutations(rank).FindIndex(t => ArrayMatch(block, t.Item1));
+                //var index = GetPermutations(rank).Count() - 1; 
 
 
                 _blocksInfo.AddRange(rankArrayCoverted);
-                
+
                 //AppendArray(_blocksInfo, InvertOrder(SubArray(rankArray, 0, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1)));
 
                 if (GetPermutations(rank).Count() != 1)
@@ -89,7 +89,6 @@ namespace WaveletTree
                     var indexArray = Convert.ToString(index, 2).PadLeft(1, '0').ToList();
                     var indexArrayCoverted = indexArray.Select(chr => chr == '1').ToList();
                     _blocksInfo.AddRange(indexArrayCoverted);
-                    //AppendArray(_blocksInfo, InvertOrder(SubArray(new List<bool>(new int[] { index }), 0, 1)));
                 }
 
 
@@ -106,10 +105,6 @@ namespace WaveletTree
             }            
         }
 
-        //private int GetRank(string query)
-        //{
-        //    return query.Count(x => x == '1');
-        //}
 
         private int GetRank(List<bool> query)
         {
@@ -152,54 +147,8 @@ namespace WaveletTree
             GeneratePermutations(array, rank);
             array.RemoveAt(array.Count() - 1);
 
-            //array.Length = array.Length + 1;
-            //array.Set(array.Length - 1, true);
-            //GeneratePermutations(array, rank - 1);
-            //array.Length = array.Length - 1;
-
-            //array.Length = array.Length + 1;
-            //array.Set(array.Length - 1, false);
-            //GeneratePermutations(array, rank);
-            //array.Length = array.Length - 1;
-
-        }
-        private List<bool> InvertOrder(List<bool> array)
-        {
-            return array;
-            //var newArray = new List<bool>(array.Length);
-            //for (int i = 0; i < array.Length; i++)
-            //    newArray.Set(i, array.Get(array.Length - i - 1));
-            //return newArray;
         }
 
-        //private List<bool> SubArray(List<bool> array, int startIndex, int length)
-        //{
-        //    var subArray = new List<bool>(length);
-        //    for (int i = 0; i < length; i++)
-        //        subArray.Set(i, array.Get(startIndex + i));
-
-        //    return subArray;
-        //}
-
-
-        //public List<bool> AAppendArray(List<bool> current, List<bool> after)
-        //{
-        //    var bools = new bool[current.Count + after.Count];
-        //    current.CopyTo(bools, 0);
-        //    after.CopyTo(bools, current.Count);
-        //    return new List<bool>(bools);
-        //}
-
-        //private List<bool> AppendArray(List<bool> mainArray, List<bool> toAdd)
-        //{
-        //    for (int i = 0; i < toAdd.Length; i++)
-        //    {
-        //        mainArray.Length++;
-        //        mainArray.Set(mainArray.Length - 1, toAdd.Get(i));
-        //    }
-        //    return mainArray;
-
-        //}
 
         private List<int> CalculateCumulative(List<bool> array)
         {
@@ -218,13 +167,6 @@ namespace WaveletTree
         private bool ArrayMatch(List<bool> item1, List<bool> item2)
         {
             return item1.SequenceEqual(item2);
-
-            //if (item1.Count != item2.Count)
-            //    return false;
-            //for (int i = 0; i < item1.Count; i++)
-            //    if (item1[i] != item2[i])
-            //        return false;
-            //return true;
         }
 
         public int CalculateRankDummy(int positition)
@@ -418,7 +360,7 @@ namespace WaveletTree
             rez += position;
 
 
-
+            var rezzz = this.CalculateSelectDummy(value);
 
             return rez;
         }
@@ -512,7 +454,7 @@ namespace WaveletTree
 
             rez += position;
 
-
+            var rezzz = this.CalculateSelectDummyZero(value);
 
 
             return rez;
