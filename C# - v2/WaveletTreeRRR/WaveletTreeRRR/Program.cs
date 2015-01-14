@@ -9,28 +9,33 @@ namespace WaveletTreeRRR
 {
    class Program
     {
-       public static long GetBinCoeff(long N, long K)
-       {
-           // This function gets the total number of unique combinations based upon N and K.
-           long r = 1;
-           long d;
-           if (K > N) return 0;
-           for (d = 1; d <= K; d++)
-           {
-               r *= N--;
-               r /= d;
-           }
-           return r;
-       }
+      
         static void Main(string[] args)
         {
-            long nPovrhk = GetBinCoeff(5, 0);
-            string[] nista={"nikaj"};
-            new WaveletTreeRRR(nista);
+            try
+            {
+                Console.Write("\nMemory used on start od program: " + GC.GetTotalMemory(false) + "bytes\n");
+                new WaveletTreeRRR(args);
+                Console.Write("Memory used: " + GC.GetTotalMemory(false) + "bytes\n");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
 
-            Console.WriteLine(Convert.ToInt32("1", 2));
 
         }
+        static int mapsize;
+
+       /* public static void inOrder(TreeNode rootNode) 
+        {
+            if (rootNode == null)
+                return;
+            inOrder(rootNode.left);
+            mapsize = mapsize + rootNode.map.size();
+            inOrder(rootNode.right);
+        }*/
 
     }
 }
