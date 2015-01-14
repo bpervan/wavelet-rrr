@@ -7,8 +7,6 @@ import math
 #citamo niz i stvaramo abecedu, neka petlja koja cita znak po 		#znak i uzima razlicite, dijeli po pola (length -1) i desni 1 
 	# i lijevi 0 te ta dva niza svaki poziva rekurzivno funkciju
 #sad trebam napravit abecedu
-
-#stvorimo lookup
 def CreateLookUp():
 	helperDict = {}
 	BlockSize = 5
@@ -35,7 +33,7 @@ def PopCount(Bitmap, boundary, cond):
 			counter = counter + 1
 			
 	return counter
-#prva verzija rrr radi
+
 def CreateRRR(nodekey,preRRR):
 	
 	lenghtsize = len(preRRR) % 5
@@ -60,8 +58,8 @@ def CreateRRR(nodekey,preRRR):
 		classcountthree = '{0:03b}'.format(classcount)
 			
 		offset = list(LookUp[classcount]).index(preRRR[i:i+5])
-		print superblocksum
-		print superblockoffset		
+		#print superblocksum
+		#print superblockoffset		
 		offsetSize = int(math.ceil(math.log(len(LookUp[classcount]), 2)))		
 		offsetValueString = '{0:0' + str(offsetSize) + 'b}'		
 		offsetValue = offsetValueString.format(offset)		
@@ -83,14 +81,12 @@ class RRR:
 		self.SuperBlockSums = []
 		self.SuperBlockOffsets = []			
 
-#not in use
 def MakeBranch():
 	
 	left = []
 	right = []
 	return
 
-#funkcija koja iz ulaznog niza stvara valic drvo
 def InitTree(niz):
 		
 	words = re.findall('[A-Z]+', niz.upper())	
@@ -120,34 +116,68 @@ def InitTree(niz):
 			right.append(ch)	
 	#print left
 	#print right
+	#print key
 	if (len(unique) > 1):
 		stablo[counter[0]] = ''.join(data) +','+ counter[1] +','+ str(counter[2])
-		
+		stablo[str(counter[1]) + str(counter[2])] = key 
 		counter[0] = counter[0] + 1
 			
 		if(len(left) > 1):
 			counter[1] = 'L'
 			counter[2] = counter [2] + 1	
-				
+			#stablo[str(counter[1]) + str(counter[2])] = key
 			InitTree(''.join(left))
+				
 			counter[2] = counter[2] - 1
+			
+			#stablo[str(counter[1]) + str(counter[2])] = key
 		#i = i +	1
 		if(len(right) > 1):
 			counter[1] = 'R'	
-			counter[2] = counter [2] + 1			
+			counter[2] = counter [2] + 1	
+			
 			InitTree(''.join(right))
+			
 			counter[2] = counter[2] - 1
+			#stablo[str(counter[1]) + str(counter[2])] = key	
 		#i = i +1	
 	else:	
 		
 		stablo[counter[0]] = ''.join(unique) +','+ counter[1] +','+ str(counter[2])
 		counter[0] = counter[0] + 1
 			
-			
+	
 	
 	
 	return
 
+def rank(char, limit):
+	value = 0
+	#for char in 
+	if (Rankhelper[0] == '0'):
+		keys = stablo['0']		
+		localkeys = {}		
+		where = keys[char]
+		value = PopCount(stablo[1],limit,int(where))
+		Rankhelper[0] = str(int(Rankhelper[0])+1)
+		if (where == '0'):
+			Rankhelper[1] = 'L'
+		else:	
+			Rankhelper[1] = 'R'
+		rank(char,value)
+	else:
+		for numeror in stablo.keys():
+			if (isinstance(numeror,int)):
+				splitted = stablo[numeror].split(',')
+				if((splitted[1] == Rankhelper[1]) and (splitted[2]==Rankhelper[0])):
+					localkeys = stablo[str(splitted[1])+str(int(splitted[2])+1)]
+					print localkeys
+					where = localkeys[char]
+					
+					value = PopCount(stablo[numeror],limit,int(where))
+					Rankhelper[0] = str(int(Rankhelper[0])+1)
+				
+	return value
 
 
 file_object = open('niz.txt', 'r')
@@ -158,28 +188,42 @@ LookUp = {}
 CreateLookUp()
 #print LookUp
 counter = [1,'root',0]
+Rankhelper = ['0','']
+Selecthelper = ['0']
 
+uniqueKey = {}
 wordsALL = re.findall('[A-Z]+', niz.upper())	
 uniqueALL = list(set(''.join(wordsALL)))
 
+
+delimit = len(uniqueALL)/2	
+for num in range (0,len(uniqueALL)):
+	if (num < delimit): 
+		uniqueKey[uniqueALL[num]] = '0'
+	else:
+		uniqueKey[uniqueALL[num]] = '1'
+#print uniqueKey
 stablo = {}
+stablo['0'] = uniqueKey
+
 InitTree(niz)
-#print stablo
-#brojejdinica = PopCount('010101010',4,'1')
-
-#print brojejdinica
-#potrebno je rastaviti stablo
-for numeror in stablo.keys():
-	splitted = stablo[numeror].split(',')
-	#if any(splitted[0] in s for s in uniqueALL):
-		#continue
-	#else:
-		#stablo[numeror] = CreateRRR(''.join(splitted[0]))
-
-test = CreateRRR(30, '11101101110000010101111110000011111000000')
-
 print stablo
+#brojejdinica = PopCount('010101010',4,'1')
+#print stablo
+#print brojejdinica
+rank('A',3)
+for numeror in stablo.keys():
+	if (isinstance(numeror,int)):
+		splitted = stablo[numeror].split(',')
+		if any(splitted[0] in s for s in uniqueALL):
+			continue
+		else:
+			CreateRRR(numeror, ''.join(splitted[0]))
+
+#test = CreateRRR(30, '11101101110000010101111110000011111000000')
 
 #print stablo
-#select i rank funkcije sad nad obicnim pa nad rrr
+
+#print stablo
+#select i rank funkcije
 #rank ide odzgor, select od dolje
