@@ -9,15 +9,17 @@ namespace WaveletTree
 {
     public class RRRStruct
     {
-        public RRRStruct(BitArray bitArray)
+        public RRRStruct(List<bool> bitArray)
         {
-            _bitArray = new BitArray(bitArray); //TODO je ovo pametno?
+            _bitArray = new List<bool>(bitArray); //TODO je ovo pametno?
             _wordLength = _bitArray.Count;
             _blockLength = (int)Math.Floor(Math.Log(_wordLength, 2) / 2);
-            var lastBlockBitCount = bitArray.Length % this._blockLength;
+            var lastBlockBitCount = bitArray.Count % this._blockLength;
             if (lastBlockBitCount != 0)
             {
-                _bitArray = AppendArray(_bitArray, new BitArray(_blockLength - lastBlockBitCount, false));
+                for (int i = 0; i < _blockLength - lastBlockBitCount; i++ )
+                    _bitArray.Add(false);
+                //_bitArray = AppendArray(_bitArray, new List<bool>(_blockLength - lastBlockBitCount, false));
             }
 
 
@@ -28,11 +30,11 @@ namespace WaveletTree
             Console.WriteLine("Created Node");
         }
 
-        private BitArray _bitArray;
+        private List<bool> _bitArray;
         private int _wordLength = 0;
         private int _blockLength = 0;
         private int _superBlockLength = 0;
-        private List<BitArray> _blocks = new List<BitArray>();
+        private List<List<bool>> _blocks = new List<List<bool>>();
         private List<Tuple<int, int>> _superBlocks = new List<Tuple<int, int>>();
 
 
@@ -42,17 +44,18 @@ namespace WaveletTree
             int i = 0;
             while (i < _wordLength)
             {
-                _blocks.Add(SubArray(_bitArray, i, _blockLength));
+                _blocks.Add(_bitArray.GetRange(i, _blockLength));
+                //_blocks.Add(SubArray(_bitArray, i, _blockLength));
                 i = i + _blockLength;
             }          
         }
 
-        private BitArray _blocksInfo = new BitArray(0);
+        private List<bool> _blocksInfo = new List<bool>(0);
 
         public void PopulateBlocksInfoAndSuperBLocksInfo()
         {
             _superBlocks.Clear();
-            _blocksInfo.Length = 0;
+            _blocksInfo.Clear();
             int blockCount = 0;
             int tmp = 0;
             int rankSum = 0;
@@ -63,17 +66,31 @@ namespace WaveletTree
                     Console.WriteLine(tmp);
                 blockCount++;
                 var rank = GetRank(block);
-                var rankArray = new BitArray(new int[] { rank });
+                //var rankArray = new List<bool>(new int[] { rank });
+                var rankArray = Convert.ToString(rank, 2).PadLeft((int)Math.Floor(Math.Log(_blockLength, 2)) + 1,'0').ToList();
+                var rankArrayCoverted = rankArray.Select(chr => chr == '1').ToList();
                 var permutations = GetPermutations(rank);
                 var index = permutations.FindIndex(t => ArrayMatch(block, t.Item1));
-                //var index = 0;
 
-                AppendArray(_blocksInfo, InvertOrder(SubArray(rankArray, 0, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1)));
+
+                _blocksInfo.AddRange(rankArrayCoverted);
+                
+                //AppendArray(_blocksInfo, InvertOrder(SubArray(rankArray, 0, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1)));
 
                 if (GetPermutations(rank).Count() != 1)
-                    AppendArray(_blocksInfo, InvertOrder(SubArray(new BitArray(new int[] { index }), 0, (int)Math.Floor(Math.Log(GetPermutations(rank).Count() - 1, 2)) + 1)));
+                {
+                    var indexArray = Convert.ToString(index, 2).PadLeft((int)Math.Floor(Math.Log(GetPermutations(rank).Count() - 1, 2)) + 1, '0').ToList();
+                    var indexArrayCoverted = indexArray.Select(chr => chr == '1').ToList();
+                    //AppendArray(_blocksInfo, InvertOrder(SubArray(new List<bool>(new int[] { index }), 0, (int)Math.Floor(Math.Log(GetPermutations(rank).Count() - 1, 2)) + 1)));
+                    _blocksInfo.AddRange(indexArrayCoverted);
+                }
                 else
-                    AppendArray(_blocksInfo, InvertOrder(SubArray(new BitArray(new int[] { index }), 0, 1)));
+                {
+                    var indexArray = Convert.ToString(index, 2).PadLeft(1, '0').ToList();
+                    var indexArrayCoverted = indexArray.Select(chr => chr == '1').ToList();
+                    _blocksInfo.AddRange(indexArrayCoverted);
+                    //AppendArray(_blocksInfo, InvertOrder(SubArray(new List<bool>(new int[] { index }), 0, 1)));
+                }
 
 
                 if (blockCount == _superBlockLength || block.Equals(_blocks[_blocks.Count() - 1]))
@@ -94,24 +111,22 @@ namespace WaveletTree
         //    return query.Count(x => x == '1');
         //}
 
-        private int GetRank(BitArray query)
+        private int GetRank(List<bool> query)
         {
-            var array = new bool[query.Count];
-            query.CopyTo(array, 0);
-            return array.Count(x => x == true);
+            return query.Count(x => x == true);
         }
 
-        private List<Tuple<BitArray, List<int>>> _permutations = new List<Tuple<BitArray, List<int>>>();
+        private List<Tuple<List<bool>, List<int>>> _permutations = new List<Tuple<List<bool>, List<int>>>();
 
-        private Dictionary<int, List<Tuple<BitArray, List<int>>>> _permutationsDictionary = new Dictionary<int, List<Tuple<BitArray, List<int>>>>();
+        private Dictionary<int, List<Tuple<List<bool>, List<int>>>> _permutationsDictionary = new Dictionary<int, List<Tuple<List<bool>, List<int>>>>();
 
-        public List<Tuple<BitArray, List<int>>> GetPermutations(int rank)
+        public List<Tuple<List<bool>, List<int>>> GetPermutations(int rank)
         {
 
             if (!_permutationsDictionary.ContainsKey(rank))
             {
-                _permutations = new List<Tuple<BitArray, List<int>>>();
-                GeneratePermutations(new BitArray(0), rank);
+                _permutations = new List<Tuple<List<bool>, List<int>>>();
+                GeneratePermutations(new List<bool>(0), rank);
                 _permutationsDictionary.Add(rank, _permutations);
                 return _permutations;
             }
@@ -119,72 +134,80 @@ namespace WaveletTree
                 return _permutationsDictionary.FirstOrDefault(t => t.Key == rank).Value;
         }
 
-        private void GeneratePermutations(BitArray array, int rank)
+        private void GeneratePermutations(List<bool> array, int rank)
         {
             if (array.Count == this._blockLength && rank == 0)
             {
-                var tempTuple = Tuple.Create(new BitArray(array), CalculateCumulative(array));
+                var tempTuple = Tuple.Create(new List<bool>(array), CalculateCumulative(array));
                 _permutations.Add(tempTuple);
                 return;
             }
             if (array.Count == this._blockLength)
                 return;
 
-            array.Length = array.Length + 1;
-            array.Set(array.Length - 1, true);
+            array.Add(true);
             GeneratePermutations(array, rank - 1);
-            array.Length = array.Length - 1;
-
-            array.Length = array.Length + 1;
-            array.Set(array.Length - 1, false);
+            array.RemoveAt(array.Count() - 1);
+            array.Add(false);
             GeneratePermutations(array, rank);
-            array.Length = array.Length - 1;
+            array.RemoveAt(array.Count() - 1);
+
+            //array.Length = array.Length + 1;
+            //array.Set(array.Length - 1, true);
+            //GeneratePermutations(array, rank - 1);
+            //array.Length = array.Length - 1;
+
+            //array.Length = array.Length + 1;
+            //array.Set(array.Length - 1, false);
+            //GeneratePermutations(array, rank);
+            //array.Length = array.Length - 1;
 
         }
-        private BitArray InvertOrder(BitArray array)
+        private List<bool> InvertOrder(List<bool> array)
         {
-            var newArray = new BitArray(array.Length);
-            for (int i = 0; i < array.Length; i++)
-                newArray.Set(i, array.Get(array.Length - i - 1));
-            return newArray;
+            return array;
+            //var newArray = new List<bool>(array.Length);
+            //for (int i = 0; i < array.Length; i++)
+            //    newArray.Set(i, array.Get(array.Length - i - 1));
+            //return newArray;
         }
 
-        private BitArray SubArray(BitArray array, int startIndex, int length)
-        {
-            var subArray = new BitArray(length);
-            for (int i = 0; i < length; i++)
-                subArray.Set(i, array.Get(startIndex + i));
+        //private List<bool> SubArray(List<bool> array, int startIndex, int length)
+        //{
+        //    var subArray = new List<bool>(length);
+        //    for (int i = 0; i < length; i++)
+        //        subArray.Set(i, array.Get(startIndex + i));
 
-            return subArray;
-        }
+        //    return subArray;
+        //}
 
 
-        public BitArray AAppendArray(BitArray current, BitArray after)
-        {
-            var bools = new bool[current.Count + after.Count];
-            current.CopyTo(bools, 0);
-            after.CopyTo(bools, current.Count);
-            return new BitArray(bools);
-        }
+        //public List<bool> AAppendArray(List<bool> current, List<bool> after)
+        //{
+        //    var bools = new bool[current.Count + after.Count];
+        //    current.CopyTo(bools, 0);
+        //    after.CopyTo(bools, current.Count);
+        //    return new List<bool>(bools);
+        //}
 
-        private BitArray AppendArray(BitArray mainArray, BitArray toAdd)
-        {
-            for (int i = 0; i < toAdd.Length; i++)
-            {
-                mainArray.Length++;
-                mainArray.Set(mainArray.Length - 1, toAdd.Get(i));
-            }
-            return mainArray;
+        //private List<bool> AppendArray(List<bool> mainArray, List<bool> toAdd)
+        //{
+        //    for (int i = 0; i < toAdd.Length; i++)
+        //    {
+        //        mainArray.Length++;
+        //        mainArray.Set(mainArray.Length - 1, toAdd.Get(i));
+        //    }
+        //    return mainArray;
 
-        }
+        //}
 
-        private List<int> CalculateCumulative(BitArray array)
+        private List<int> CalculateCumulative(List<bool> array)
         {
             var cumulative = new List<int>();
             int sum = 0;
             for (int i = 0; i < array.Count; i++)
             {
-                if (array.Get(i) == true)
+                if (array[i] == true)
                     sum++;
 
                 cumulative.Add(sum);
@@ -192,14 +215,16 @@ namespace WaveletTree
             return cumulative;
         }
 
-        private bool ArrayMatch(BitArray item1, BitArray item2)
+        private bool ArrayMatch(List<bool> item1, List<bool> item2)
         {
-            if (item1.Count != item2.Count)
-                return false;
-            for (int i = 0; i < item1.Count; i++)
-                if (item1[i] != item2[i])
-                    return false;
-            return true;
+            return item1.SequenceEqual(item2);
+
+            //if (item1.Count != item2.Count)
+            //    return false;
+            //for (int i = 0; i < item1.Count; i++)
+            //    if (item1[i] != item2[i])
+            //        return false;
+            //return true;
         }
 
         public int CalculateRankDummy(int positition)
@@ -207,7 +232,7 @@ namespace WaveletTree
             var array = _bitArray;
             int rank = 0;
             for (int i = 0; i <= positition; i++)
-                if (array.Get(i) == true)
+                if (array[i] == true)
                     rank++;
 
             return rank;
@@ -247,13 +272,14 @@ namespace WaveletTree
             return result;
         }
 
-        private Tuple<int, int> AddNBlocks(int StartPosition, BitArray array, int n)
+        private Tuple<int, int> AddNBlocks(int StartPosition, List<bool> array, int n)
         {
             int sum = 0;
             int offset = 0;
             for (int i = 0; i < n; i++)
             {
-                var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+                var blockClassBits = array.GetRange(StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1); 
+                //var blockClassBits = SubArray(array, StartPosition + offset, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
                 var blockClass = ArrayToInt(blockClassBits);
                 sum = sum + blockClass;
                 offset = offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1;
@@ -267,27 +293,29 @@ namespace WaveletTree
             return Tuple.Create(sum, offset);
         }
 
-        private List<int> GetBlockCumalativeSum(int startPosition, BitArray array)
+        private List<int> GetBlockCumalativeSum(int startPosition, List<bool> array)
         {
-            var blockClassBits = SubArray(array, startPosition, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
+            var blockClassBits = array.GetRange(startPosition, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1); 
+            //var blockClassBits = SubArray(array, startPosition, (int)Math.Floor(Math.Log(_blockLength, 2)) + 1);
             var blockClass = ArrayToInt(blockClassBits);
             var permutationsListSize = GetPermutations(blockClass).Count();
             int bitsNeeded;
             if (permutationsListSize != 1)
                 bitsNeeded = (int)Math.Floor(Math.Log(permutationsListSize - 1, 2)) + 1;
             else bitsNeeded = 1;
-            var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
+            var permutationIndexArray = array.GetRange(startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
+            //var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
             var permutationIndex = ArrayToInt(permutationIndexArray);
             return GetPermutations(blockClass)[permutationIndex].Item2;
         }
 
-        private int ArrayToInt(BitArray array)
+        private int ArrayToInt(List<bool> array)
         {
             int sum = 0;
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < array.Count; i++)
             {
-                if (array.Get(i))
-                    sum = sum + (int)(Math.Pow(2, array.Length - 1 - i));
+                if (array[i])
+                    sum = sum + (int)(Math.Pow(2, array.Count - 1 - i));
             }
             return sum;
         }

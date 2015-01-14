@@ -15,8 +15,8 @@ namespace WaveletTree
             //string fileName = args[0];
             //char inputChar = args[1][0];
             //int position = Convert.ToInt32(args[2]);
-            int position = 123456;
-            char inputChar = 'G';
+            int position = 4443210;
+            char inputChar = 'a';
 
             //Console.WriteLine(fileName);
             //Console.WriteLine(inputChar);
@@ -29,7 +29,7 @@ namespace WaveletTree
             //    fasta = true;
 
             string text;
-            text = System.IO.File.ReadAllText("input1.fa");
+            text = System.IO.File.ReadAllText("input2.fas");
             text = text.Substring(text.IndexOf(System.Environment.NewLine) + 2);
             //if (fasta)
             //{
