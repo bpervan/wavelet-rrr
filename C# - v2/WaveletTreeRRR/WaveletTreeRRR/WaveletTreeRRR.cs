@@ -925,20 +925,7 @@ namespace WaveletTreeRRR
                popCount = popcount(block);
                TableG.FirstOrDefault(t => t.Key == popCount).Value.Add(block);
            }
-/*
-               for (int i = 0; i <= BlockSize; i++)
-               {
-                   List<string> offsets = new List<string>();
-                   StringBuilder initOffset = new StringBuilder();
-                   //int offsetBitsNeeded =(int)Math.Log((GetBinCoeff(blockSize, i)),2); //kao dictionary (klasa, kolko bitova za offsete)
-                   for (int j = 0; j < BlockSize; j++)
-                       if (j <= BlockSize - 1 - i)  //i broj jedinica
-                           initOffset.Append("0");
-                       else initOffset.Append("1");
 
-                   Permutation(initOffset.ToString(), offsets);
-                   TableG.Add(i, offsets);
-               }*/
         
         }
         public static string ToBin(int value, int len)
@@ -958,32 +945,6 @@ namespace WaveletTreeRRR
             }
 
             return counter;
-        }
-
-        
-        
-        public static void Permutation(string input, List<string> list)
-        {
-            RecPermutation("", input, list);
-        }
-        private static void RecPermutation(string soFar, string input, List<string> list)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                if (!(list.Contains(soFar)))
-                    list.Add(soFar);
-
-                return;
-            }
-            else
-            {
-                for (int i = 0; i < input.Length; i++)
-                {
-
-                    string remaining = input.Substring(0, i) + input.Substring(i + 1);
-                    RecPermutation(soFar + input[i], remaining, list);
-                }
-            }
         }
     };
 
