@@ -15,8 +15,8 @@ namespace WaveletTree
             //string fileName = args[0];
             //char inputChar = args[1][0];
             //int position = Convert.ToInt32(args[2]);
-            int position = 4443210;
-            char inputChar = 'a';
+            int position = 10;
+            char inputChar = 'G';
 
             //Console.WriteLine(fileName);
             //Console.WriteLine(inputChar);
@@ -29,8 +29,8 @@ namespace WaveletTree
             //    fasta = true;
 
             string text;
-            text = System.IO.File.ReadAllText("input2.fas");
-            text = text.Substring(text.IndexOf(System.Environment.NewLine) + 2);
+            text = System.IO.File.ReadAllText("input.fa");
+            text = text.Substring(text.IndexOf(System.Environment.NewLine) + System.Environment.NewLine.Count());
             //if (fasta)
             //{
             //    text = System.IO.File.ReadAllText(fileName);
@@ -42,8 +42,12 @@ namespace WaveletTree
             //    text = System.IO.File.ReadAllText(fileName);
             //}
             //Console.WriteLine(text);
+            var z = text.Count();
 
-            string newString = text.Replace(System.Environment.NewLine, "");
+            var replaceWith = "";
+            string newString = text.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            //string newString = text.Replace(System.Environment.NewLine, "");
+            var x = newString.Count();
 
             //Console.WriteLine(newString.Count());
 
@@ -56,8 +60,12 @@ namespace WaveletTree
             
            
             var tree = new Tree(newString);
+            var list = newString.ToList();
             st.Start();
-            var rank = tree.GetRank(inputChar, position);
+            //var rrr = new RRRStruct(list.Select(t => t == '1').ToList());
+            //var xx = rrr.CalculateSelectZero(400);
+            var gg = tree.GetSelect(inputChar,position);
+            //var rank = tree.GetRank(inputChar, position);
             st.Stop();
             var elap = st.ElapsedMilliseconds;
             var rankDummy = 0;
@@ -69,9 +77,9 @@ namespace WaveletTree
             }
             st1.Stop();
             var el = st1.ElapsedMilliseconds;
-            Console.WriteLine(rank);
+            //Console.WriteLine(rank);
             Console.Write(rankDummy);
-            //Console.Write(newString);
+            Console.ReadLine();
             
 
         }
