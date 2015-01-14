@@ -1,4 +1,5 @@
 #Upute za testiranje
+
 U direktoriju se nalaze 3 testne datoteke:
 input.fa - duljna genoma: 502
 input1.fa - duljina genoma: 4 570 937 - E.Coli
@@ -23,7 +24,7 @@ Dakle poziv: WaveletTree input1.fa rank A 238
 Na isti način poziva se i program za provjeru:
 char_counter input1.fa rank A 238
 
-Napomena: implementacije u Javi, C#-u, i C++-u umjesto rank i select parametra koriste R ili S
+Napomena: implementacije u Javi, C#-V2, i C++-u umjesto rank i select parametra koriste R ili S
 dakle: WaveletTree R A 234 ili WaveletTree S C 23
 
 #Primjeri testova
@@ -64,7 +65,9 @@ Očekivani rezultat: 132287
 WaveletTree input2.fas select C 543210
 Očekivani rezultat: 2226555
 
-
+#napomena - rezultati select operacija mogu se razlikovati za -1 jer su neke implementacije
+vraćale indeks znaka, a neke broj znakova, uključivo s tim znakom. Isto vrijedi i za rank operacije
+samo za +1 zbog razlike [0,i> i [0, i]. Testovi su izvedeni s rank [0,i> i select broj elemenata.
 
 
 
