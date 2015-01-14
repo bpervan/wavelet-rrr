@@ -122,7 +122,7 @@ public class Main {
             lutInts++; // integer (4 bajta)
             for(Map.Entry<BooleanArray, Integer> entry2 : entry.getValue().entrySet()){
                 lutInts++; //integer (4 bajta)
-                lutBooleans++; //boolean (4 bajta)
+                lutBooleans++; //boolean (1 bajt)
             }
         }
         blokovi += (rootNode.data.classes.size()); //integer (4 bajta) svaki dvaput jer je za classes i offsets
