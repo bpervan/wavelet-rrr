@@ -12,30 +12,24 @@ namespace WaveletTree
     {
         static void Main(string[] args)
         {
+            //paring arguments
             string fileName = args[0];
             string opertation = args[1];
             char inputChar = args[2][0];
             int position = Convert.ToInt32(args[3]);
 
-            //string fileName = "input1.fa";
-            //string opertation = "select";
-            //char inputChar = 'A';
-            //int position = 12345;
 
-
-
+            //parsing input text (comments and newlines)
             string text;
             text = System.IO.File.ReadAllText(fileName);
             text = text.Substring(text.IndexOf(System.Environment.NewLine) + System.Environment.NewLine.Count());
-
-
             var replaceWith = "";
             string newString = text.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
 
             System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch st1 = new System.Diagnostics.Stopwatch();
 
-
+            //creating WaveletTree and calling rank/select operations
             st.Start();
             var tree = new Tree(newString);
             st.Stop();
@@ -50,12 +44,6 @@ namespace WaveletTree
                 st1.Stop();
                 Console.Write("Rank calculating: ");
                 Console.WriteLine(st1.ElapsedMilliseconds);
-                //for (int i = 0; i <= position; i++)
-                //{
-                //    if (newString[i] == inputChar)
-                //        rankDummy++;
-                //}
-                //Console.WriteLine(rankDummy);
             }
             if (opertation == "select")
             {
@@ -67,31 +55,8 @@ namespace WaveletTree
                 st1.Stop();
                 Console.Write("Select calculating: ");
                 Console.WriteLine(st1.ElapsedMilliseconds);
-                //for (int i = 0; i <= newString.Count(); i++)
-                //{
-                //    if (newString[i] == inputChar)
-                //        sum++;
-                //    if (sum == position)
-                //    {
-                //        Console.WriteLine(i);
-                //        break;
-                //    }                   
-
-                //}
                 
             }
-            //var rankDummy = 0;
-            //st1.Start();            
-            //for (int i = 0; i <= position; i++)
-            //{
-            //    if (newString[i] == inputChar)
-            //        rankDummy++;
-            //}
-            //st1.Stop();
-            //var el = st1.ElapsedMilliseconds;
-            ////Console.WriteLine(rank);
-            //Console.Write(rankDummy);
-            Console.ReadLine();
             
 
         }

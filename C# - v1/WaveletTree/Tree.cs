@@ -7,11 +7,15 @@ using System.Collections;
 
 namespace WaveletTree
 {
+    //Creates wavelet tree structure and call methods from RRRStruct to calculate rank and select operations
     public class Tree
     {
         private string _text;
         private List<bool> _bitArrayText = new List<bool>();
 
+        //constructor
+        //separates input strings int two substrings and creates its own childs from that data
+        //recursive invocation is stopped when string alphabet has less than 3 characters (that is leaf node)
         public Tree(string text)
         {
             SortChars(text);
@@ -20,8 +24,6 @@ namespace WaveletTree
                 _text = text;
                 string leftText = "";
                 string rightText = "";
-                //_bitArrayText.Length = text.Count();
-                //int bitsAdded = 0;
                 if (text.Count() < 4)
                 {
                     foreach (var chr in text)
@@ -30,46 +32,30 @@ namespace WaveletTree
                         {
                             leftText = leftText + chr.ToString();
                             _bitArrayText.Add(false);
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(bitsAdded, false);
                         }
                         else
                         {
                             rightText = rightText + chr.ToString();
                             _bitArrayText.Add(true);
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(bitsAdded, true);
                         }
-                        //bitsAdded++;
                     }
                 }
                 else
                 {
-                    //int h = 0;
                     var leftStringBuilder = new StringBuilder();
                     var rightStringBuilder = new StringBuilder();
                     foreach (var chr in text)
                     {
-                        //h++;
-                        //if (h % 10000 == 0)
-                        //    Console.WriteLine(h);
                         if (GoesLeft(chr))
                         {
                             leftStringBuilder.Append(chr);
-                            //leftText.Insert(leftText.Count(), chr.ToString());
-                            //leftText = leftText + chr.ToString();
-                            //_bitArrayText.Set(bitsAdded, false);
                             _bitArrayText.Add(false);
                         }
                         else
                         {
                             rightStringBuilder.Append(chr);
-                            //rightText.Insert(rightText.Count(), chr.ToString());
-                            //rightText = rightText + chr.ToString();
-                            //_bitArrayText.Set(bitsAdded, true);
                             _bitArrayText.Add(true);
                         }
-                        //bitsAdded++;
                     }
                     leftText = leftStringBuilder.ToString();
                     rightText = rightStringBuilder.ToString();
@@ -80,8 +66,6 @@ namespace WaveletTree
             }
             else
             {
-                //int bitsAdded = 0;
-                //_bitArrayText.Length = text.Count();
                 _text = text;
                 if (text.Count() < 4)
                 {
@@ -89,42 +73,26 @@ namespace WaveletTree
                     {
                         if (GoesLeft(chr))
                         {
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(_bitArrayText.Length - 1, false);
                             _bitArrayText.Add(false);
                         }
                         else
                         {
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(_bitArrayText.Length - 1, true);
                             _bitArrayText.Add(true);
                         }
                     }
                 }
                 else
                 {
-                    //int h = 0;
                     foreach (var chr in text)
                     {
-                        //h++;
-                        //if (h % 10000 == 0)
-                        //    Console.WriteLine(h);
                         if (GoesLeft(chr))
                         {
-                            //leftText = leftText + chr.ToString();
-                           // _bitArrayText.Set(bitsAdded, false);
                             _bitArrayText.Add(false);
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(_bitArrayText.Length - 1, false);
                         }
                         else
                         {
                             _bitArrayText.Add(true);
-                            //_bitArrayText.Set(bitsAdded, true);
-                            //_bitArrayText.Length = _bitArrayText.Length + 1;
-                            //_bitArrayText.Set(_bitArrayText.Length - 1, true);
                         }
-                        //bitsAdded++;
                     }
                     rrrStruct = new RRRStruct(_bitArrayText);
                 }
@@ -150,12 +118,13 @@ namespace WaveletTree
 
         List<char> _sortedChars = new List<char>();
 
+        //gets different chars from string and sorts them
         private void SortChars(string str)
         {
             _sortedChars = str.Distinct().OrderBy(c => c).ToList();
-            //_sortedChars = String.Concat(str.OrderBy(c => c)).Distinct().ToList();
         }
 
+        //check if char should go to left or right child node
         private bool GoesLeft(char chr)
         {
             if (_sortedChars.IndexOf(chr) < (_sortedChars.Count() / 2))
@@ -164,6 +133,9 @@ namespace WaveletTree
                 return false;
         }
 
+        //calculates rank
+        //recursively calls itself until it reaches the leaf node as described in documentation
+        //also, it uses rrr structure to call rank operation on array of bools
         public int GetRank(char letter, int position)
         {
 
@@ -201,6 +173,10 @@ namespace WaveletTree
             return result;
         }
 
+
+        //calculates select
+        //recursively calls itself until it reaches the leaf node as described in documentation
+        //also, it uses rrr structure to call rank operation on array of bools
         public int GetSelect(char letter, int position)
         {
             if (!this._sortedChars.Contains(letter))
@@ -249,6 +225,10 @@ namespace WaveletTree
             }
         }
 
+
+        /* Brute force methods that calculate rank and select operations for small input arrays 
+         * 
+         * */
         public int CalculateRankDummy(int positition)
         {
             var array = _bitArrayText;
