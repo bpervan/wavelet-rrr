@@ -17,10 +17,11 @@ namespace WaveletTree
             char inputChar = args[2][0];
             int position = Convert.ToInt32(args[3]);
 
-           /* string fileName = "input1.fa";
-            string opertation = "select";
-            char inputChar = 'T';
-            int position = 1000000; */
+            //string fileName = "input1.fa";
+            //string opertation = "select";
+            //char inputChar = 'A';
+            //int position = 12345;
+
 
 
             string text;
