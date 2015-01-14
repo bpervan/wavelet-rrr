@@ -204,7 +204,7 @@ int selectOperation (WaveletTree *tree, char c, int i) {
         bool value = getDictionaryValue(current->dict, current->dictLength, c);
         //Select = selectOnBitmap(current->bitmap->bm, value, Select, current->bitmap->length);
         Select = selectRRR (current->rrr, value, Select, current->table);
-        //printf ("Select: %d", Select);
+        //printf ("Select: %d %d", Select, value);
         current = current->parent;
     }
 
