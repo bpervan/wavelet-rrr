@@ -11,7 +11,9 @@ namespace WaveletTree
     {
         public RRRStruct(List<bool> bitArray)
         {
-            _bitArray = new List<bool>(bitArray); 
+            
+            _bitArray = new List<bool>(bitArray);
+           // sumofallsums += bitArray.Count();
             _wordLength = _bitArray.Count;
             _blockLength = (int)Math.Floor(Math.Log(_wordLength, 2) / 2);
             var lastBlockBitCount = bitArray.Count % this._blockLength;
@@ -26,8 +28,27 @@ namespace WaveletTree
             PopulateBlocks();
             PopulateBlocksInfoAndSuperBLocksInfo();
 
-            Console.WriteLine("Created Node");
+            for (int i = 0; i <= _blockLength; i++)
+                GetPermutations(i);
+
+            var Infosize = _blocksInfo.Count();
+            var permutationSum = 0;
+            foreach(var perm in _permutationsDictionary)
+            {
+                var list = perm.Value;
+                foreach(var value in list)
+                {
+                    permutationSum = value.Item1.Count + (value.Item2.Count * 4);
+                }
+            }
+
+            //var sizeSum = permutationSum + Infosize;
+            //sumofallsums += sizeSum;
+
+
+               // Console.WriteLine(sumofallsums);
         }
+        public static int sumofallsums;
 
         private List<bool> _bitArray;
         private int _wordLength = 0;
@@ -347,7 +368,7 @@ namespace WaveletTree
             if (permutationsListSizeFinal != 1)
                 bitsNeededFinal = (int)Math.Floor(Math.Log(permutationsListSizeFinal - 1, 2)) + 1;
             else bitsNeededFinal = 1;
-            var permutationIndexArrayFinal = _blocksInfo.GetRange(offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
+            var permutationIndexArrayFinal = _blocksInfo.GetRange(StartPosition + offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
             //var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
             var permutationIndex = ArrayToInt(permutationIndexArrayFinal);
             //return GetPermutations(blockClass)[permutationIndex].Item2;
