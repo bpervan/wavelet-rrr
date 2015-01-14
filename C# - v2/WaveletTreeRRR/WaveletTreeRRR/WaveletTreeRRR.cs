@@ -29,8 +29,10 @@ namespace WaveletTreeRRR
                 throw new Exception("Error. Check your arguments.");
             }
 
+            //Stopwatch is being used for measuring time consumption of key methods
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
+            //FASTA file reading
             readFile(args[0]);
             stopWatch.Stop();
             
@@ -40,19 +42,21 @@ namespace WaveletTreeRRR
             Console.WriteLine("Reading of whole FASTA file was taking " + stopWatch.Elapsed.TotalMilliseconds + " ms");
             stopWatch.Reset();
 
-           
+            //determination of original sequence alphabet
             stopWatch.Start();
             getAlphabet();
             stopWatch.Stop();
             Console.WriteLine("Getting and sorting the FASTA sequence alphabet was taking " + stopWatch.Elapsed.TotalMilliseconds + " ms");
             stopWatch.Reset();
             
+            //wavelet tree construction
             stopWatch.Start();
             buildWaveletTree(alphabet, originalSequence, rootNode);
             stopWatch.Stop();
             Console.WriteLine("Wavelet tree was made in " + stopWatch.Elapsed.TotalMilliseconds + " ms");
             stopWatch.Reset();
 
+            //loading arguments
             try
 			{
 				operation = Char.ToUpper(Char.Parse(args[1]));
@@ -69,16 +73,18 @@ namespace WaveletTreeRRR
 
             if (operation == 'S')
             {
-                stopWatch.Start();
+                /*stopWatch.Start();
                 Console.WriteLine("Select operation without RRR data structure for ("+ charachter +", "+boundary+") gave result " + select(boundary,charachter));
                 stopWatch.Stop();
                 Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
-                stopWatch.Reset();
+                stopWatch.Reset();*/
 
+                //calling select(c,i) method
                 stopWatch.Start();
                 Console.WriteLine("Select operation using RRR data structure for (" + charachter + ", " + boundary + ") gave result " + selectRRR(boundary, charachter));
                 stopWatch.Stop();
                 Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+                stopWatch.Reset();
             }
             else if (operation == 'R')
             {
@@ -87,7 +93,8 @@ namespace WaveletTreeRRR
                 stopWatch.Stop();
                 Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
                 stopWatch.Reset();*/
-
+                
+                //calling rank(c,i) method
                 stopWatch.Start();
                 Console.WriteLine("Rank operation using RRR data structure for (" + charachter + ", " + boundary + ") gave result " + rankRRR(rootNode, boundary, charachter, alphabet));
                 stopWatch.Stop();
@@ -98,6 +105,8 @@ namespace WaveletTreeRRR
 
 
         }
+
+        //method readFile() reads whole FASTA file and separates comments from nucleotide sequence 
         private void readFile(String filePath)
         {
 
@@ -130,6 +139,7 @@ namespace WaveletTreeRRR
 
         }
 
+        //getAlphabet() determinates charachers which builds input nucleotide string and puts them into ArrayString
         public void getAlphabet()
         {
             if (originalSequence.Length > 0)
@@ -154,6 +164,8 @@ namespace WaveletTreeRRR
             }
         }
 
+        //method buildWaveletTree() constructs wavelet tree. It calls creation of RRR lookup table and
+        //adds RRR data structure to every node.
         public void buildWaveletTree(ArrayList currentAlphabet, String currentLabel, WaveletNode currentNode)
         {
             if (currentAlphabet.Count > 2)
@@ -164,10 +176,11 @@ namespace WaveletTreeRRR
                 StringBuilder RRRbitmap = new StringBuilder();
                 int blockSize;
                 int superblockSize;
-                
+
 
                 int mid = (currentAlphabet.Count + 1) / 2;
 
+                //creation of node bitmap
                 foreach (char c in currentLabel)
                 {
                     if (getIndex(Char.ToUpper(c), currentAlphabet) < mid)
@@ -190,60 +203,48 @@ namespace WaveletTreeRRR
                 {
                     blockSize = 1;
                 }
-                superblockSize = (int)(blockSize* Math.Floor(Math.Log(currentNode.getBitmap().Length, 2)));
-                
+                superblockSize = (int)(blockSize * Math.Floor(Math.Log(currentNode.getBitmap().Length, 2)));
+
+                //creation of RRRLookupTable 
                 currentNode.RRRTable.BlockSize = blockSize;
                 currentNode.RRRTable.SuperblockSize = superblockSize;
                 currentNode.RRRTable.ClassBitsNeeded = (int)Math.Floor(Math.Log(blockSize, 2)) + 1;
                 currentNode.RRRTable.buildTableG();
 
-                //isois tablice
-               /* for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
+                //filling the bitmap with additional zeroes so that every block is equal in size
+                if (bitmapBuilder.Length % blockSize != 0)
                 {
-                    List<String> listaOffset = new List<string>();
-                    Console.WriteLine("index klase " + i);
-                    listaOffset = currentNode.RRRTable.TableG[i];
-                    foreach (string s in listaOffset)
-                        Console.WriteLine(s);
-                }
-                */
-                    //nadopuni zadnji blok sa nulama
-                    if (bitmapBuilder.Length % blockSize != 0)
+                    do
                     {
-                        do
-                        {
-                            bitmapBuilder.Append("0");
-                        } while (bitmapBuilder.Length % blockSize != 0);
+                        bitmapBuilder.Append("0");
+                    } while (bitmapBuilder.Length % blockSize != 0);
 
-                    }
-                //postavi bitmapBuilder u helpBitmap
+                }
+
+                //creation of bitmap which is being used for creation od RRR data structure
                 currentNode.setHelpBitmap(bitmapBuilder.ToString());
-                //iteriranje od bloka do bloka sa zbrajanjem jedinica u pojedinom bloku
-                //pseudokod u biljeznici
-                int totalPopcount=0;
-                for (int i = 0; i < currentNode.getHelpBitmap().Length; i=i+blockSize)
-                { 
-                    int popCount = popcount(currentNode.getHelpBitmap().Substring(i,blockSize));
-                    RRRbitmap.Append(ToBin(popCount,currentNode.RRRTable.ClassBitsNeeded)); //spremi klasu sa potrebnim brojem bitova
-                    RRRbitmap.Append(ToBin(currentNode.RRRTable.TableG.FirstOrDefault(t => t.Key == popCount).Value.IndexOf(currentNode.getHelpBitmap().Substring(i,blockSize)),(int)Math.Ceiling(Math.Log((GetBinCoeff(blockSize, popCount)),2))));
+
+                //creation od RRR Data Structure 
+                int totalPopcount = 0;
+                for (int i = 0; i < currentNode.getHelpBitmap().Length; i = i + blockSize)
+                {
+                    int popCount = popcount(currentNode.getHelpBitmap().Substring(i, blockSize));
+                    RRRbitmap.Append(ToBin(popCount, currentNode.RRRTable.ClassBitsNeeded)); //spremi klasu sa potrebnim brojem bitova
+                    RRRbitmap.Append(ToBin(currentNode.RRRTable.TableG.FirstOrDefault(t => t.Key == popCount).Value.IndexOf(currentNode.getHelpBitmap().Substring(i, blockSize)), (int)Math.Ceiling(Math.Log((GetBinCoeff(blockSize, popCount)), 2))));
                     totalPopcount += popCount;
-                    if (((i+blockSize) % superblockSize) == 0 || (i+blockSize) >= currentNode.getHelpBitmap().Length)
+                    if (((i + blockSize) % superblockSize) == 0 || (i + blockSize) >= currentNode.getHelpBitmap().Length)
                     {
                         currentNode.RRRStruct.superblockSums.Add(totalPopcount);
-                        currentNode.RRRStruct.superblockOffsets.Add(RRRbitmap.Length);                   
-                     }
-  
+                        currentNode.RRRStruct.superblockOffsets.Add(RRRbitmap.Length);
+                    }
+
                 }
-
-               
-
                 currentNode.RRRStruct.Bitmap = RRRbitmap.ToString();
                 currentNode.setLeftChild(new WaveletNode());
                 currentNode.getLeftChild().setParent(currentNode);
-
-
                 buildWaveletTree(currentAlphabet.GetRange(0, mid), leftLabel.ToString(), currentNode.getLeftChild());
 
+                //if current alphabet has more than 3 characters, than it creates right child and calls recursion on this child
                 if (currentAlphabet.Count > 3)
                 {
                     currentNode.setRightChild(new WaveletNode());
@@ -255,7 +256,7 @@ namespace WaveletTreeRRR
 
             }
             else
-            {
+            {   //creation of child nodes
                 if (currentAlphabet.Count == 2)
                 {
                     StringBuilder bitmapBuilder = new StringBuilder();
@@ -283,19 +284,6 @@ namespace WaveletTreeRRR
                     currentNode.RRRTable.ClassBitsNeeded = (int)Math.Floor(Math.Log(blockSize, 2)) + 1;
                     currentNode.RRRTable.buildTableG();
 
-                    
-
-                    /*for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
-                    {
-                        List<String> listaOffset = new List<string>();
-                        Console.WriteLine("klasa " + i);
-                        listaOffset = currentNode.RRRTable.TableG[i];
-                        foreach (string s in listaOffset)
-                            Console.WriteLine(s);
-                    }
-                    */
-
-                    //nadopuni zadnji blok sa nulama
                     if (bitmapBuilder.Length % blockSize != 0)
                     {
                         do
@@ -304,12 +292,9 @@ namespace WaveletTreeRRR
                         } while (bitmapBuilder.Length % blockSize != 0);
 
                     }
-                    //postavi bitmapBuilder u helpBitmap
+
                     currentNode.setHelpBitmap(bitmapBuilder.ToString());
 
-                   
-                    //iteriranje od bloka do bloka sa zbrajanjem jedinica u pojedinom bloku
-                    //pseudokodsam napisao u biljeznicu
                     int totalPopcount = 0;
                     for (int i = 0; i < currentNode.getHelpBitmap().Length; i = i + blockSize)
                     {
@@ -324,19 +309,13 @@ namespace WaveletTreeRRR
                         }
 
                     }
-
-                   
-
                     currentNode.RRRStruct.Bitmap = RRRbitmap.ToString();
-                    
-
                 }
-
                 return;
             }
-
         }
 
+        //getIndex() returns index of a character in an arrayList. Used for determination of index of char in alphabet
         public int getIndex(char c, ArrayList arrayList)
         {
             for (int i = 0; i < arrayList.Count; i++)
@@ -350,6 +329,8 @@ namespace WaveletTreeRRR
             return -1;
         }
 
+        //method rank() which doesn't use RRR data structure. It returns number of occurenses for given character
+        //in input nucleotide sequence
         public int rank(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
            {
 
@@ -386,7 +367,8 @@ namespace WaveletTreeRRR
                }
            }
 
-
+        //method rank() which uses RRR data structure. It returns number of occurenses for given character
+        //in input nucleotide sequence
         public int rankRRR(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
            {
                int blockIndex;
@@ -418,7 +400,7 @@ namespace WaveletTreeRRR
 
                blocksRemaining = blockIndex - (currentNode.RRRTable.SuperblockSize / currentNode.RRRTable.BlockSize) * superBlockIndex;
                
-               //blockIndex - kolko sam blokova preskočio
+               
                int shift = currentPos;
                int lastClass;
                int lastOffset;
@@ -465,7 +447,7 @@ namespace WaveletTreeRRR
                }
            }
 
-       
+       //popcount(string, int) iterates through string and returns number of sets bits in binary string until given index
         public int popcount(String bitmap, int index)
            {
                int counter = 0;
@@ -480,6 +462,8 @@ namespace WaveletTreeRRR
 
                return counter;
            }
+
+        //popcount(string) returns the number od set bits in binary string
         public int popcount(String bitmap)
         {
             int counter = 0;
@@ -495,14 +479,15 @@ namespace WaveletTreeRRR
             return counter;
         }
 
+        //ToBin() method is being used for returning integer value in binary base with given width
         public static string ToBin(int value, int len)
         {
             return (len > 1 ? ToBin(value >> 1, len - 1) : null) + "01"[value & 1];
         }
 
+        //method GetBinCoeff() return the total number of unique combinations based upon N and K(binominal coefficient)
         public static long GetBinCoeff(long N, long K)
         {
-            // This function gets the total number of unique combinations based upon N and K.
             long r = 1;
             long d;
             if (K > N) return 0;
@@ -514,6 +499,7 @@ namespace WaveletTreeRRR
             return r;
         }
 
+        //selectRRR() method returns index of n-th occurence of given character in input nucleotide string
         public int selectRRR(int nthOccurrence, char character)
         {
 
@@ -553,13 +539,11 @@ namespace WaveletTreeRRR
                     characterRepresentedWithZero = false;
             }
 
-
-
-            // tree traversal bottom-up once we have node representing our character
+            //  bottom-up tree traversal once we have node representing given character
             int position = selectOnBitmap(currentNode, nthOccurrence, characterRepresentedWithZero);
             if (position == 0)
             {
-                return -1; // that indicates that there is no n occurrences of character!
+                return -1; // no n occurrences of character
             }
 
             WaveletNode child = currentNode;
@@ -583,6 +567,8 @@ namespace WaveletTreeRRR
             return position - 1;
         }
 
+        //selectOnBitmap() method returns the index of n-th occurence of given character(0 or 1).
+        //It uses RRR data structure.
         int selectOnBitmap(WaveletNode currentNode, int index, bool characterRepresentedWithZero) 
         {
 
@@ -615,7 +601,7 @@ namespace WaveletTreeRRR
                    else
                    {
                        if (!characterRepresentedWithZero)
-                           suma += klass; // ako je value false onda je suma += blocksize - klasa
+                           suma += klass;
                        else
                            suma += currentNode.RRRTable.BlockSize - klass;
                        offsetBits = (int)Math.Ceiling(Math.Log((GetBinCoeff(currentNode.RRRTable.BlockSize, klass)), 2));
@@ -644,6 +630,8 @@ namespace WaveletTreeRRR
             
         }
 
+        //select() method returns the index of n-th occurence of given character in input nucleotide string.
+        //It doesn't use RRR data structure, it uses regular bitmap.
         public int select(int nthOccurrence, char character)
         {
 
@@ -683,13 +671,10 @@ namespace WaveletTreeRRR
                     characterRepresentedWithZero = false;
             }
 
-
-
-            // tree traversal bottom-up once we have node representing our character
             int position = getPositionOfNthOccurrence(currentNode.getBitmap(), nthOccurrence, characterRepresentedWithZero);
             if (position == 0)
             {
-                return -1; // that indicates that there is no n occurrences of character!
+                return -1;
             }
 
             WaveletNode child = currentNode;
@@ -713,6 +698,7 @@ namespace WaveletTreeRRR
             return position-1;
         }
 
+        //select() method returns the index of n-th occurence of given character(which is 0 or 1) in given bitmap.
         public int getPositionOfNthOccurrence(String bitmap, int nthOcurrance, bool characterRepresentedWithZero)
         {
             int counter = 0;
@@ -732,52 +718,47 @@ namespace WaveletTreeRRR
                     break;
             }
 
-            if (counter == nthOcurrance) // if this is not true, that means that there are no n occurances in bitmap!
+            if (counter == nthOcurrance)
                 return position;
             else
                 return 0;
         }
 
+        //Interval class is being used in select methods for determing the current alphabet (in certain wavalet node) 
         class Interval
         {
             private int leftIndex;
             private int rightIndex;
 
-            //Sets starting and ending index
             public Interval(int leftIndex, int rightIndex)
             {
                 this.leftIndex = leftIndex;
                 this.rightIndex = rightIndex;
             }
 
-            //Get left index
             public int getLeftIndex()
             {
                 return leftIndex;
             }
 
-            //Get right index
             public int getRightIndex()
             {
                 return rightIndex;
             }
 
-            //Set left index while going into right node
             public void setLeftIndex()
             {
                 this.leftIndex = rightIndex - (getSize() / 2 - 1);
             }
 
-            //Set right index while going into left node
             public void setRightIndex()
             {
                 this.rightIndex = leftIndex + ((getSize() + 1) / 2 - 1); // getSize + 1 because on odd size of alphabet, left half is bigger for 1
             }
 
-            //Check if interval is bigger than 2
             public bool isGreaterThanTwo()
             {
-                if ((rightIndex - leftIndex) > 1) // because it's inclusive
+                if ((rightIndex - leftIndex) > 1) 
                 {
                     return true;
                 }
@@ -788,14 +769,11 @@ namespace WaveletTreeRRR
 
             }
 
-
-            // Get index in the middle of the interval
             public int getMiddleIndex()
             {
                 return (this.leftIndex + this.rightIndex) / 2;
             }
 
-            //Get interval size
             public int getSize()
             {
                 return rightIndex - leftIndex + 1;
@@ -806,7 +784,7 @@ namespace WaveletTreeRRR
      
 
 
-
+    //WavaletNode class stores information nodes in wavelet tree
     class WaveletNode
     {
         private String bitmap;
@@ -869,10 +847,11 @@ namespace WaveletTreeRRR
         }
     }
 
+    //class RRRDataStructure stores information of RRR data structure of WaveletNode
     class RRRDataStructure {
-        private String bitmap; //string that stores class_index,offset_index pairs
-        public List<int> superblockOffsets = new List<int>(); // offset number--pointer to next superblock(total number of bits until the end of superblock)
-        public List<int> superblockSums= new List<int>();  //number of set bits until the end of superblock
+        private String bitmap;                                  //string that stores class_index,offset_index pairs
+        public List<int> superblockOffsets = new List<int>();   //offset number-pointer to next superblock(total number of bits until the end of superblock)
+        public List<int> superblockSums= new List<int>();       //number of set bits until the end of superblock
 
         public String Bitmap
         {
@@ -883,7 +862,7 @@ namespace WaveletTreeRRR
        
     };
 
-
+    //class RRRLookupTable stores lookup table for creating RRR data structure, and mathod that creates it
     class RRRLookupTable {
         private int blockSize;
         private int superblockSize;
@@ -908,7 +887,7 @@ namespace WaveletTreeRRR
             set { tableG = value; }
         }  
 
-        //construction of Lookup Table for RRR structure
+        //construction of lookup Table for RRR structure
         public void buildTableG() {
 
            TableG = new Dictionary<int, List<string>>();
