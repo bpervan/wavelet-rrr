@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 			cout <<result <<" [" <<us <<" us]" <<endl;
 		}
 		else {
-			cout <<"Failed. Wrong index" <<endl;
+			cout <<"Failed. Wrong character or index" <<endl;
 		}
 	}
 	else if (rank_or_select == 'S') {
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 			cout <<result <<" [" <<us <<" us]" <<endl;
 		}
 		else {
-			cout <<"Failed. Wrong index" <<endl;
+			cout <<"Failed. Wrong character or index" <<endl;
 		}
 	}
 	else {

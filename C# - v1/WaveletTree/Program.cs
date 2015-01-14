@@ -12,16 +12,15 @@ namespace WaveletTree
     {
         static void Main(string[] args)
         {
-            //string fileName = args[0];
-            //string opertation = args[1];
-            //char inputChar = args[2][0];
-            //int position = Convert.ToInt32(args[3]);
+            string fileName = args[0];
+            string opertation = args[1];
+            char inputChar = args[2][0];
+            int position = Convert.ToInt32(args[3]);
 
-            string fileName = "input1.fa";
+           /* string fileName = "input1.fa";
             string opertation = "select";
-            char inputChar = 'A';
-            int position = 12345;
-
+            char inputChar = 'T';
+            int position = 1000000; */
 
 
             string text;
