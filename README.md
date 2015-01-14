@@ -43,3 +43,17 @@ Java<br />
 - 2. Locate out/production/WaveletTreeRRR folder<br />
 - 3. java hr.fer.bio.project.main.Main FileName (R|S) char bound<br />
 <br />
+
+C# - v1<br />
+- 1. Locate C# - v1 folder<br />
+- 2. Locate WaveletTreeRRR folder<br />
+- 3. gmcs -target:exe -out:WaveletTree.exe -*.cs<br />
+- 4. mono WaveletTree.exe FileName (R|S) char bound<br />
+<br />
+
+C# - v2<br />
+- 1. Locate C# - v2 folder<br />
+- 2. Locate WaveletTreeRRR/WaveletTreeRRR folder<br />
+- 3. gmcs -target:exe -out:WaveletTree.exe -*.cs<br />
+- 4. mono WaveletTree.exe FileName (rank|select) char bound<br />
+<br />
