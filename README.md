@@ -14,19 +14,19 @@ Python - [pintir](http://github.com/pintir)<br />
 
 #Usage
 C<br />
-1. Locate C folder<br />
-2. make<br />
-3. ./WaveletTree FileName (rank|select) char bound<br />
+- 1. Locate C folder<br />
+- 2. make<br />
+- 3. ./WaveletTree FileName (rank|select) char bound<br />
 <br />
 
 C++<br />
-1. Locate C++ folder<br />
-2. make<br />
-3. ./WaveletTree FileName (R|S) char bound<br />
+- 1. Locate C++ folder<br />
+- 2. make<br />
+- 3. ./WaveletTree FileName (R|S) char bound<br />
 <br />
 
 Java<br />
-1. Locate Java folder<br />
-2. Locate out/production/WaveletTreeRRR folder<br />
-2. java hr.fer.bio.project.main.Main FileName (R|S) char bound<br />
+- 1. Locate Java folder<br />
+- 2. Locate out/production/WaveletTreeRRR folder<br />
+- 3. java hr.fer.bio.project.main.Main FileName (R|S) char bound<br />
 <br />
