@@ -4,8 +4,10 @@ input.fa - duljna genoma: 502
 input1.fa - duljina genoma: 4 570 937 - E.Coli
 input2.fas - duljina genoma: 5 524 970
 
-Svaka FASTA datoteka sastoji se od linije zaglavlja (počinje s >) te genoma. 
+Prve dvije FASTA datoteke sastoji se od linije zaglavlja (počinje s >) te genoma. 
 Newline znakovi unutar genoma ignoriraju se (abeceda se sastoji od A, T, G i C znakova). 
+
+Zadnja FASTA datoteka sastoji se od 16 znakova (prošireni FASTA)
 
 U direktoriju se nalazi i program za provjeru ispravnosti operacija rank i select:
 char_counter.c
@@ -50,16 +52,16 @@ Očekivani rezultat: 305484
 WaveletTree input1.fa select T 1000000
 Očekivani rezultat: 4053864
 
-WaveletTree input2.fas rank t 4000000
+WaveletTree input2.fas rank T 4000000
 Očekivani rezultat: 990024
 
-WaveletTree input2.fas select a 40000
+WaveletTree input2.fas select A 40000
 Očekivani rezultat: 167264
 
-WaveletTree input2.fas rank a 543210
+WaveletTree input2.fas rank A 543210
 Očekivani rezultat: 132287
 
-WaveletTree input2.fas select c 543210
+WaveletTree input2.fas select C 543210
 Očekivani rezultat: 2226555
 
 

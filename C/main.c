@@ -98,13 +98,30 @@ int main (int argc, char* argv[]) {
     }
 
     //i = calculateNodeMemoryUsage (tree->rootNode);
+    i = calculateNodeMemoryUsageRRR (tree->rootNode);
 
-    //printf ("Memory usage: %d\n", i);
+    printf ("Memory usage: %d\n", i);
 
     return 0;
 }
 
+/** Računanje memorije (bez RRR) */ 
 int calculateNodeMemoryUsage (WaveletNode *node) {
+    int i = 0, j, k;
+
+    if (node == NULL) return i;
+
+    i+= 2 * node->dictLength;
+    i+= node->bitmap->length / 8 + 1;
+
+    i+= calculateNodeMemoryUsage(node->leftChild);
+    i+= calculateNodeMemoryUsage(node->rightChild);
+
+    return i;
+}
+
+/** Računanje memorije (s RRR) */
+int calculateNodeMemoryUsageRRR (WaveletNode *node) {
     int i = 0, j, k;
 
     if (node == NULL) return i;

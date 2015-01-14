@@ -167,8 +167,8 @@ int rankOperation (WaveletTree *tree, char c, int i) {
         The operation is finished when there is no more children nodes */
     while (current != NULL) {
         bool value = getDictionaryValue(current->dict, current->dictLength, c);
-        Rank = popcount (current->bitmap->bm, value, Rank);
-        //Rank = popcountRRR (current->rrr, value, Rank, current->table);
+        //Rank = popcount (current->bitmap->bm, value, Rank);
+        Rank = popcountRRR (current->rrr, value, Rank, current->table);
         if (value) {
             current = current->rightChild;
         } else {
@@ -202,8 +202,8 @@ int selectOperation (WaveletTree *tree, char c, int i) {
     /** Performing select operation */
     while (current != NULL) {
         bool value = getDictionaryValue(current->dict, current->dictLength, c);
-        Select = selectOnBitmap(current->bitmap->bm, value, Select, current->bitmap->length);
-        //Select = selectRRR (current->rrr, value, Select, current->table);
+        //Select = selectOnBitmap(current->bitmap->bm, value, Select, current->bitmap->length);
+        Select = selectRRR (current->rrr, value, Select, current->table);
         //printf ("Select: %d", Select);
         current = current->parent;
     }

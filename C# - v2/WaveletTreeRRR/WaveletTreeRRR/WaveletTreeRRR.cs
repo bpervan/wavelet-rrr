@@ -82,11 +82,11 @@ namespace WaveletTreeRRR
             }
             else if (operation == 'R')
             {
-                stopWatch.Start();
+                /*stopWatch.Start();
                 Console.WriteLine("Rank operation without RRR data structure for (" + charachter + ", " + boundary + ") gave result " + rank(rootNode, boundary, charachter, alphabet));
                 stopWatch.Stop();
                 Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
-                stopWatch.Reset();
+                stopWatch.Reset();*/
 
                 stopWatch.Start();
                 Console.WriteLine("Rank operation using RRR data structure for (" + charachter + ", " + boundary + ") gave result " + rankRRR(rootNode, boundary, charachter, alphabet));
