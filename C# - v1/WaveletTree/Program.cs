@@ -19,8 +19,8 @@ namespace WaveletTree
 
             string fileName = "input1.fa";
             string opertation = "select";
-            char inputChar = 'T';
-            int position = 1000000;
+            char inputChar = 'A';
+            int position = 12345;
 
 
 

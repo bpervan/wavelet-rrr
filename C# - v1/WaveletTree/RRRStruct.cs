@@ -441,7 +441,7 @@ namespace WaveletTree
             if (permutationsListSizeFinal != 1)
                 bitsNeededFinal = (int)Math.Floor(Math.Log(permutationsListSizeFinal - 1, 2)) + 1;
             else bitsNeededFinal = 1;
-            var permutationIndexArrayFinal = _blocksInfo.GetRange(offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
+            var permutationIndexArrayFinal = _blocksInfo.GetRange(StartPosition + offset + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeededFinal);
             //var permutationIndexArray = SubArray(array, startPosition + (int)Math.Floor(Math.Log(_blockLength, 2)) + 1, bitsNeeded);
             var permutationIndex = ArrayToInt(permutationIndexArrayFinal);
             //return GetPermutations(blockClass)[permutationIndex].Item2;
