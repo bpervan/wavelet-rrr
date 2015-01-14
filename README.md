@@ -3,4 +3,4 @@ wavelet-rrr
 
 Wavelet tree with RRR structure as nodes, implementations in C, C++, C#, Java and Python
 
-Project for Bioinformatics course at University of Zagreb, Croatia
+Project for Bioinformatics course at University of Zagreb, Croatia [LINK](http://www.fer.unizg.hr/en/course/bio)
