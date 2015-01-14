@@ -38,7 +38,7 @@ namespace WaveletTreeRRR
             
 
             Console.WriteLine("Comments are: " + commentLines);
-            Console.WriteLine("FASTA sequence has" + originalSequence.Length + " characters");
+            Console.WriteLine("FASTA sequence has " + originalSequence.Length + " characters");
             Console.WriteLine("Reading of whole FASTA file was taking " + stopWatch.Elapsed.TotalMilliseconds + " ms");
             stopWatch.Reset();
 
