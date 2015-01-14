@@ -229,8 +229,9 @@ namespace WaveletTree
             else
             {
                 var childResult = this.leftNode.GetSelect(letter, position) + this.rightNode.GetSelect(letter, position);
+                childResult++;
                 var select = 0;
-                if (GoesLeft(letter) == false)
+                if (GoesLeft(letter))
                 {
                     if (Text.Count() > 3)
                         select = rrrStruct.CalculateSelectZero(childResult);
