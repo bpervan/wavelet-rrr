@@ -83,6 +83,7 @@ class RRR:
 		self.SuperBlockSums = []
 		self.SuperBlockOffsets = []			
 
+#not in use
 def MakeBranch():
 	
 	left = []
@@ -167,6 +168,7 @@ InitTree(niz)
 #brojejdinica = PopCount('010101010',4,'1')
 
 #print brojejdinica
+#potrebno je rastaviti stablo
 for numeror in stablo.keys():
 	splitted = stablo[numeror].split(',')
 	#if any(splitted[0] in s for s in uniqueALL):
@@ -179,5 +181,5 @@ test = CreateRRR(30, '11101101110000010101111110000011111000000')
 print stablo
 
 #print stablo
-#select i rank funkcije
+#select i rank funkcije sad nad obicnim pa nad rrr
 #rank ide odzgor, select od dolje
