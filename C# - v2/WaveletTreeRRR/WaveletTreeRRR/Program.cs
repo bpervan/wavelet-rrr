@@ -9,26 +9,19 @@ namespace WaveletTreeRRR
 {
    class Program
     {
-       public static long GetBinCoeff(long N, long K)
-       {
-           // This function gets the total number of unique combinations based upon N and K.
-           long r = 1;
-           long d;
-           if (K > N) return 0;
-           for (d = 1; d <= K; d++)
-           {
-               r *= N--;
-               r /= d;
-           }
-           return r;
-       }
+      
         static void Main(string[] args)
         {
-            long nPovrhk = GetBinCoeff(5, 0);
-            string[] nista={"nikaj"};
-            new WaveletTreeRRR(nista);
+            try
+            {
+                new WaveletTreeRRR(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
 
-            Console.WriteLine(Convert.ToInt32("1", 2));
 
         }
 

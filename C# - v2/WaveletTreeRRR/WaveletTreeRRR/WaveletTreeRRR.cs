@@ -14,40 +14,87 @@ namespace WaveletTreeRRR
         private ArrayList alphabet;
         private WaveletNode rootNode;
 
-        private char symbol;
-        private int pos;
+        private char charachter;
+        private char operation;
+        private int boundary;
+
 
         public WaveletTreeRRR(string[] args)
         {
             alphabet = new ArrayList();
             rootNode = new WaveletNode();
-            /*
-            if (args.Length != 3)
+            
+            if (args.Length != 4)
             {
                 throw new Exception("Error. Check your arguments.");
             }
-            
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             readFile(args[0]);
-             */
-            originalSequence = "GGGCTATCGTGCAGGATCAGACTCCTTAACGCGCGTAGGAGACTATGGTGGAAAGACATCAAGAGAGGCTGTCCGAAGTAGATGAAGGTTCTACCTTGGACAGCCTCCCATTTTACTGGATATGAAAGCGTTATTTTAAGAAGTGGACTAGCGCATCGGGGAGCTCTTGCTGCCAAAATCCCCACAAATGTTTCCCGTCCTTCTCCAAATAGGTGACTCTGGCTCCGCGCTCTTCGAGCAAGGCTTTGGCTTTGCGATTTAACTCAACAAAATTATAGGTGCCTGTATCCGTTGTATAATGATCTTCCTGTAATCCCACGATCATAAAGAGCGACAAATAGGAGAGATCGGTCTCCTGAGCGAGGAGGTTAAGGGACGGTTCATAGTAGGCGCCGGACAAGCTAATGATTTTGGAAAACAGTTTTGGATTTTTCATAGCCAGGTGGAGGGAGACCGTTGCTCCTAAAGAGTCACCAGCCAGCACCCTTTCCTCGGGTTCACGG";
-            commentLines = "KOMENTAR";
-            Console.WriteLine(commentLines);
-            Console.WriteLine("Sequence has" + originalSequence.Length + " characters");
+            stopWatch.Stop();
+            
 
+            Console.WriteLine("Comments are: " + commentLines);
+            Console.WriteLine("FASTA sequence has" + originalSequence.Length + " characters");
+            Console.WriteLine("Reading of whole FASTA file was taking " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+            stopWatch.Reset();
+
+           
+            stopWatch.Start();
             getAlphabet();
-            Console.WriteLine("ABECEDA ULAZNOG NIZA");
-            for (int i = 0; i < alphabet.Count;i++)
-                Console.WriteLine(alphabet[i]);
-
+            stopWatch.Stop();
+            Console.WriteLine("Getting and sorting the FASTA sequence alphabet was taking " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+            stopWatch.Reset();
+            
+            stopWatch.Start();
             buildWaveletTree(alphabet, originalSequence, rootNode);
+            stopWatch.Stop();
+            Console.WriteLine("Wavelet tree was made in " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+            stopWatch.Reset();
 
-          // symbol = Char.ToUpper(Char.Parse(args[1]));
-           // pos = int.Parse(args[2]) - 1;
+            try
+			{
+				operation = Char.ToUpper(Char.Parse(args[1]));
+                charachter = Char.ToUpper(Char.Parse(args[2]));
+                boundary = int.Parse(args[3]);
 
-            symbol = 'G';
-            pos = 0;
-            Console.WriteLine("simbol= "+symbol + " pozicija= "+ pos + " RANK= " + rankRRR(rootNode, pos, symbol, alphabet));
-            Console.WriteLine("simbol= " + symbol + " pozicija= " +pos + " SELECT= " + select(2,'R'));
+			}
+            catch(Exception e)
+            {
+				throw new Exception("Error loading arguments");
+			}
+
+            
+
+            if (operation == 'S')
+            {
+                stopWatch.Start();
+                Console.WriteLine("Select operation without RRR data structure for ("+ charachter +", "+boundary+") gave result " + select(boundary,charachter));
+                stopWatch.Stop();
+                Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+                stopWatch.Reset();
+
+                stopWatch.Start();
+                Console.WriteLine("Select operation using RRR data structure for (" + charachter + ", " + boundary + ") gave result " + selectRRR(boundary, charachter));
+                stopWatch.Stop();
+                Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+            }
+            else if (operation == 'R')
+            {
+                stopWatch.Start();
+                Console.WriteLine("Rank operation without RRR data structure for (" + charachter + ", " + boundary + ") gave result " + rank(rootNode, boundary, charachter, alphabet));
+                stopWatch.Stop();
+                Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+                stopWatch.Reset();
+
+                stopWatch.Start();
+                Console.WriteLine("Rank operation using RRR data structure for (" + charachter + ", " + boundary + ") gave result " + rankRRR(rootNode, boundary, charachter, alphabet));
+                stopWatch.Stop();
+                Console.WriteLine("Operation lasted for " + stopWatch.Elapsed.TotalMilliseconds + " ms");
+                stopWatch.Reset();
+            }
+            else Console.WriteLine("'"+operation+"' operation does not exist!");
 
 
         }
@@ -123,7 +170,7 @@ namespace WaveletTreeRRR
 
                 foreach (char c in currentLabel)
                 {
-                    if (getIndex(c, currentAlphabet) < mid)
+                    if (getIndex(Char.ToUpper(c), currentAlphabet) < mid)
                     {
                         bitmapBuilder.Append("0");
                         leftLabel.Append(Char.ToUpper(c));
@@ -147,12 +194,11 @@ namespace WaveletTreeRRR
                 
                 currentNode.RRRTable.BlockSize = blockSize;
                 currentNode.RRRTable.SuperblockSize = superblockSize;
-                Console.WriteLine("BLOKSIZE " + blockSize + " SUPERBLOKSIZE " + superblockSize);
                 currentNode.RRRTable.ClassBitsNeeded = (int)Math.Floor(Math.Log(blockSize, 2)) + 1;
                 currentNode.RRRTable.buildTableG();
 
                 //isois tablice
-                for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
+               /* for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
                 {
                     List<String> listaOffset = new List<string>();
                     Console.WriteLine("index klase " + i);
@@ -160,7 +206,7 @@ namespace WaveletTreeRRR
                     foreach (string s in listaOffset)
                         Console.WriteLine(s);
                 }
-
+                */
                     //nadopuni zadnji blok sa nulama
                     if (bitmapBuilder.Length % blockSize != 0)
                     {
@@ -172,7 +218,6 @@ namespace WaveletTreeRRR
                     }
                 //postavi bitmapBuilder u helpBitmap
                 currentNode.setHelpBitmap(bitmapBuilder.ToString());
-                Console.Write("bitmapa: " + currentNode.getHelpBitmap());
                 //iteriranje od bloka do bloka sa zbrajanjem jedinica u pojedinom bloku
                 //pseudokod u biljeznici
                 int totalPopcount=0;
@@ -185,9 +230,7 @@ namespace WaveletTreeRRR
                     if (((i+blockSize) % superblockSize) == 0 || (i+blockSize) >= currentNode.getHelpBitmap().Length)
                     {
                         currentNode.RRRStruct.superblockSums.Add(totalPopcount);
-                        Console.WriteLine("\nSuperblock sum " + totalPopcount);
-                        currentNode.RRRStruct.superblockOffsets.Add(RRRbitmap.Length);
-                        Console.WriteLine("Superblok offset " + RRRbitmap.Length);
+                        currentNode.RRRStruct.superblockOffsets.Add(RRRbitmap.Length);                   
                      }
   
                 }
@@ -195,9 +238,6 @@ namespace WaveletTreeRRR
                
 
                 currentNode.RRRStruct.Bitmap = RRRbitmap.ToString();
-
-                Console.WriteLine("RRR bitmapa: " + currentNode.RRRStruct.Bitmap + "\n\n");
-
                 currentNode.setLeftChild(new WaveletNode());
                 currentNode.getLeftChild().setParent(currentNode);
 
@@ -225,7 +265,7 @@ namespace WaveletTreeRRR
 
                     foreach (char c in currentLabel)
                     {
-                        if (getIndex(c, currentAlphabet) + 1 == 1)
+                        if (getIndex(Char.ToUpper(c), currentAlphabet) + 1 == 1)
                         {
                             bitmapBuilder.Append("0");
                         }
@@ -245,7 +285,7 @@ namespace WaveletTreeRRR
 
                     
 
-                    for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
+                    /*for (int i = 0; i < currentNode.RRRTable.TableG.Keys.Count; i++)
                     {
                         List<String> listaOffset = new List<string>();
                         Console.WriteLine("klasa " + i);
@@ -253,7 +293,7 @@ namespace WaveletTreeRRR
                         foreach (string s in listaOffset)
                             Console.WriteLine(s);
                     }
-
+                    */
 
                     //nadopuni zadnji blok sa nulama
                     if (bitmapBuilder.Length % blockSize != 0)
@@ -267,7 +307,7 @@ namespace WaveletTreeRRR
                     //postavi bitmapBuilder u helpBitmap
                     currentNode.setHelpBitmap(bitmapBuilder.ToString());
 
-                    Console.Write("bitmapa: " + currentNode.getHelpBitmap());
+                   
                     //iteriranje od bloka do bloka sa zbrajanjem jedinica u pojedinom bloku
                     //pseudokodsam napisao u biljeznicu
                     int totalPopcount = 0;
@@ -280,9 +320,7 @@ namespace WaveletTreeRRR
                         if (((i + blockSize) % superblockSize) == 0 || (i + blockSize) >= currentNode.getHelpBitmap().Length)
                         {
                             currentNode.RRRStruct.superblockSums.Add(totalPopcount);
-                            Console.WriteLine("\nSuperblock sum " + totalPopcount);
                             currentNode.RRRStruct.superblockOffsets.Add(RRRbitmap.Length);
-                            Console.WriteLine("Superblok offset " + RRRbitmap.Length);
                         }
 
                     }
@@ -290,8 +328,7 @@ namespace WaveletTreeRRR
                    
 
                     currentNode.RRRStruct.Bitmap = RRRbitmap.ToString();
-                    Console.WriteLine("RRR bitmapa: " + currentNode.RRRStruct.Bitmap+"\n\n");
-
+                    
 
                 }
 
@@ -313,7 +350,7 @@ namespace WaveletTreeRRR
             return -1;
         }
 
-           public int rank(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
+        public int rank(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
            {
 
                if (!currentAlphabet.Contains(character))
@@ -350,7 +387,7 @@ namespace WaveletTreeRRR
            }
 
 
-           public int rankRRR(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
+        public int rankRRR(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
            {
                int blockIndex;
                int superBlockIndex; 
@@ -368,7 +405,6 @@ namespace WaveletTreeRRR
 
                blockIndex = index / currentNode.RRRTable.BlockSize;
                superBlockIndex = blockIndex / (currentNode.RRRTable.SuperblockSize / currentNode.RRRTable.BlockSize);
-                Console.WriteLine("INDEX BLOKA " + blockIndex + " INDEX SUPERBLOKA " + superBlockIndex);
                if (superBlockIndex == 0)
                {
                    currentPos = 0;
@@ -377,15 +413,11 @@ namespace WaveletTreeRRR
                else
                {
                    currentPos = currentNode.RRRStruct.superblockOffsets[superBlockIndex - 1];
-                   Console.WriteLine("CURRENT POSITION(MORAM BITI 224 " + currentPos); //dobro je
                    bitsSum = currentNode.RRRStruct.superblockSums[superBlockIndex - 1];
-                   Console.WriteLine("OVO MORA BITI 114 " + bitsSum);//dobro je
                }
-            
 
+               blocksRemaining = blockIndex - (currentNode.RRRTable.SuperblockSize / currentNode.RRRTable.BlockSize) * superBlockIndex;
                
-               blocksRemaining =blockIndex - (currentNode.RRRTable.SuperblockSize / currentNode.RRRTable.BlockSize) * superBlockIndex;
-               Console.WriteLine("blocks rem -->moram biti 2 " + blocksRemaining);
                //blockIndex - kolko sam blokova preskočio
                int shift = currentPos;
                int lastClass;
@@ -396,27 +428,19 @@ namespace WaveletTreeRRR
                for (int i=0; i<blocksRemaining;i++)
                {
                    klass=Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift, currentNode.RRRTable.ClassBitsNeeded),2);
-                   Console.WriteLine("Class: " + klass);
                    bitsSum+=klass;
                    offsetBits = (int)Math.Ceiling(Math.Log((GetBinCoeff(currentNode.RRRTable.BlockSize, klass)), 2));
                    if (offsetBits == 0) offsetBits = 1;
                    shift =shift + currentNode.RRRTable.ClassBitsNeeded + offsetBits;
                }
 
-               Console.WriteLine("SHIFT " + shift);
-
-               Console.WriteLine("KLASA ČIJI OFFSET TRAŽIMO " + currentNode.RRRStruct.Bitmap.Substring(shift, currentNode.RRRTable.ClassBitsNeeded));//dobije se klasa 6, nje nema
                lastClass = Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift, currentNode.RRRTable.ClassBitsNeeded), 2);
               
                offsetBits = (int)Math.Ceiling(Math.Log((GetBinCoeff(currentNode.RRRTable.BlockSize, lastClass)), 2));
                if (offsetBits == 0) offsetBits = 1;
-               Console.WriteLine("BROJ BITOVA KOJE CITAM ZA OFFSET " + offsetBits);            
-               Console.WriteLine("INDEX OFFSETA " + currentNode.RRRStruct.Bitmap.Substring(shift+currentNode.RRRTable.ClassBitsNeeded, offsetBits));
                lastOffset = Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift+currentNode.RRRTable.ClassBitsNeeded, offsetBits), 2);
                bitsSum += popcount(currentNode.RRRTable.TableG[lastClass][lastOffset], index % currentNode.RRRTable.BlockSize);
-               Console.WriteLine("IZ TABLICE: " + currentNode.RRRTable.TableG[lastClass][lastOffset]);
-               Console.WriteLine("Bits sum: " + bitsSum);
-
+               
                if (getIndex(character, currentAlphabet) < mid)
                {
                    newIndex = index - bitsSum;
@@ -441,51 +465,7 @@ namespace WaveletTreeRRR
                }
            }
 
-          /*public int selectRRR(WaveletNode currentNode, int index, char character, ArrayList currentAlphabet)
-           {
-               int mid = (currentAlphabet.Count + 1) / 2;
-               int Select = 0, shift, suma = 0;
-               bool value;
-               if (getIndex(character, currentAlphabet) < mid)
-                   value = false;
-               else 
-                   value=true;
-                   //overflow
-               for (superblock in superblocks) {
-                   if ((superblock.sum > index && value) || (superblock.index*superblock.size - superblock.sum) && !value) {
-                       break;
-                   } else {
-                       Select = superblock.size * superblock.index;//broj bitova prijeđenih do sada
-                       suma = superblock.sum;
-                       shift = superblock.offset;
-                   }
-               }
-
-               for (blocks in superblock) {
-                   klasa = block.klasa;
-                   if (suma + klasa > index) break;
-                   else {
-                       suma += klasa; // ako je value false onda je suma += blocksize - klasa
-                       shift += brojBitovazaklasu + brojbitovazaoffsetteklase;
-                       Select += velicina_bloka;
-                   }
-               }
-
-               block = tablica[lastClass][lastoffset];
-               for (i = 0; i < block.size; ++i) {
-
-                   if (suma == index) break;
-
-                   Select++;
-                   if (block[i] == 1 && value || block[i] == 0 && !value)
-                       suma ++;
-               }
-
-               return SelectRRR (currentNode->parent, Select);
-
-               return 0;
-           }
-        */
+       
         public int popcount(String bitmap, int index)
            {
                int counter = 0;
@@ -532,6 +512,136 @@ namespace WaveletTreeRRR
                 r /= d;
             }
             return r;
+        }
+
+        public int selectRRR(int nthOccurrence, char character)
+        {
+
+            Interval alphabeticInterval = new Interval(0, alphabet.Count - 1);
+            WaveletNode currentNode = rootNode;
+            int indexOfCharInAlph = getIndex(character, alphabet);
+            bool characterRepresentedWithZero = true;
+
+            while (alphabeticInterval.isGreaterThanTwo())
+            {
+                if (alphabeticInterval.getSize() == 3)
+                {
+                    if (alphabeticInterval.getRightIndex() == indexOfCharInAlph)
+                    {
+                        characterRepresentedWithZero = false;
+                        break;
+                    }
+                }
+
+                if (indexOfCharInAlph <= alphabeticInterval.getMiddleIndex())
+                {
+                    currentNode = currentNode.getLeftChild();
+                    alphabeticInterval.setRightIndex();
+                }
+                else
+                {
+                    currentNode = currentNode.getRightChild();
+                    alphabeticInterval.setLeftIndex();
+                }
+            }
+
+            if (characterRepresentedWithZero)
+            {
+                if (alphabeticInterval.getLeftIndex() == indexOfCharInAlph)
+                    characterRepresentedWithZero = true;
+                else
+                    characterRepresentedWithZero = false;
+            }
+
+
+
+            // tree traversal bottom-up once we have node representing our character
+            int position = selectOnBitmap(currentNode, nthOccurrence, characterRepresentedWithZero);
+            if (position == 0)
+            {
+                return -1; // that indicates that there is no n occurrences of character!
+            }
+
+            WaveletNode child = currentNode;
+            currentNode = currentNode.getParent();
+
+            while (currentNode != null)
+            {
+                if (currentNode.getLeftChild().Equals(child))
+                {
+                    position = selectOnBitmap(currentNode, position, true);
+                }
+                else
+                {
+                    position = selectOnBitmap(currentNode, position, false);
+                }
+
+                currentNode = currentNode.getParent();
+                child = child.getParent();
+            }
+
+            return position - 1;
+        }
+
+        int selectOnBitmap(WaveletNode currentNode, int index, bool characterRepresentedWithZero) 
+        {
+
+            int suma = 0, Select = 0, shift = 0;
+            for (int i = 0; i < currentNode.RRRStruct.superblockOffsets.Count; i++)
+            {
+                if ((currentNode.RRRStruct.superblockSums[i] >= index && !characterRepresentedWithZero) || (((i+1) * currentNode.RRRTable.SuperblockSize - (currentNode.RRRStruct.superblockSums[i]) >= index && characterRepresentedWithZero)))
+                    break;
+                else
+                {
+                    Select = currentNode.RRRTable.SuperblockSize * (i+1);//broj bitova prijeđenih do sada
+                    if (!characterRepresentedWithZero)
+                        suma = currentNode.RRRStruct.superblockSums[i];
+                    else
+                        suma = (i+1) * currentNode.RRRTable.SuperblockSize - (currentNode.RRRStruct.superblockSums[i]);
+                  
+                    shift = currentNode.RRRStruct.superblockOffsets[i];             
+                }
+            }
+                       
+               int klass;
+               int offsetBits;
+               int lastClass;
+               int lastOffset;
+               string lastBlock;
+               for (int i=0;i<currentNode.RRRTable.SuperblockSize/currentNode.RRRTable.BlockSize;i++) {
+                   klass=Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift, currentNode.RRRTable.ClassBitsNeeded),2);
+
+                   if (((suma + klass >= index) && !characterRepresentedWithZero) || ((suma + currentNode.RRRTable.BlockSize - klass) >= index && characterRepresentedWithZero)) break;
+                   else
+                   {
+                       if (!characterRepresentedWithZero)
+                           suma += klass; // ako je value false onda je suma += blocksize - klasa
+                       else
+                           suma += currentNode.RRRTable.BlockSize - klass;
+                       offsetBits = (int)Math.Ceiling(Math.Log((GetBinCoeff(currentNode.RRRTable.BlockSize, klass)), 2));
+                       if (offsetBits == 0) offsetBits = 1;
+                       shift = shift + currentNode.RRRTable.ClassBitsNeeded + offsetBits;
+                       Select += currentNode.RRRTable.BlockSize;
+                   }
+               }
+
+               lastClass = Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift, currentNode.RRRTable.ClassBitsNeeded), 2);
+              
+               offsetBits = (int)Math.Ceiling(Math.Log((GetBinCoeff(currentNode.RRRTable.BlockSize, lastClass)), 2));
+               if (offsetBits == 0) offsetBits = 1;
+               lastOffset = Convert.ToInt32(currentNode.RRRStruct.Bitmap.Substring(shift+currentNode.RRRTable.ClassBitsNeeded, offsetBits), 2);
+               lastBlock=currentNode.RRRTable.TableG[lastClass][lastOffset];
+               for (int i = 0; i < lastBlock.Length; i++) {
+
+                   if (suma == index) break;
+                   Select++;
+                   if ((lastBlock[i] == '1' && !characterRepresentedWithZero) || (lastBlock[i] == '0' && characterRepresentedWithZero))
+                       suma ++;
+               }
+        
+               return Select;
+                 
+            
         }
 
         public int select(int nthOccurrence, char character)
@@ -802,21 +912,52 @@ namespace WaveletTreeRRR
         public void buildTableG() {
 
            TableG = new Dictionary<int, List<string>>();
-            
-            for(int i=0; i<=BlockSize; i++)
-              {
-                List<string> offsets = new List<string>();
-                StringBuilder initOffset= new StringBuilder();
-                //int offsetBitsNeeded =(int)Math.Log((GetBinCoeff(blockSize, i)),2); //kao dictionary (klasa, kolko bitova za offsete)
-                for (int j = 0; j < BlockSize; j++)
-                    if (j <= BlockSize - 1 - i)  //i broj jedinica
-                        initOffset.Append("0");
-                    else initOffset.Append("1");
+           string block;
+           int popCount;
+           for (int i = 0; i <= BlockSize; i++)
+           {
+               TableG.Add(i, new List<string>());
+           }
+               
+           for (int i = 0; i < Math.Pow(2, BlockSize); ++i)
+           {
+               block = ToBin(i, BlockSize);
+               popCount = popcount(block);
+               TableG.FirstOrDefault(t => t.Key == popCount).Value.Add(block);
+           }
+/*
+               for (int i = 0; i <= BlockSize; i++)
+               {
+                   List<string> offsets = new List<string>();
+                   StringBuilder initOffset = new StringBuilder();
+                   //int offsetBitsNeeded =(int)Math.Log((GetBinCoeff(blockSize, i)),2); //kao dictionary (klasa, kolko bitova za offsete)
+                   for (int j = 0; j < BlockSize; j++)
+                       if (j <= BlockSize - 1 - i)  //i broj jedinica
+                           initOffset.Append("0");
+                       else initOffset.Append("1");
 
-                Permutation(initOffset.ToString(), offsets);
-                TableG.Add(i, offsets);
-            }
+                   Permutation(initOffset.ToString(), offsets);
+                   TableG.Add(i, offsets);
+               }*/
         
+        }
+        public static string ToBin(int value, int len)
+        {
+            return (len > 1 ? ToBin(value >> 1, len - 1) : null) + "01"[value & 1];
+        }
+        public int popcount(String bitmap)
+        {
+            int counter = 0;
+
+            for (int i = 0; i < bitmap.Length; i++)
+            {
+                if (bitmap.ElementAt(i) == '1')
+                {
+                    counter++;
+                }
+            }
+
+            return counter;
         }
 
         
