@@ -4,10 +4,10 @@ import re
 import itertools 
 import math
 
-#citamo niz i stvaramo abecedu, neka petlja koja cita znak po 		#znak i uzima razlicite, dijeli po pola (length -1) i desni 1 
-	# i lijevi 0 te ta dva niza svaki poziva rekurzivno funkciju
-#sad trebam napravit abecedu
+#Funkcija koja kreira LookUptablice za RRR strukturu
 def CreateLookUp():
+	#ideja funkcije ja da za fiksne vrijednosti stvori tablicu na temelju svih permutacija
+	#napravljena je na fiksni nacin radi brzeg izvodnjenja
 	helperDict = {}
 	BlockSize = 5
 	SuperBlockSize = 4 * BlockSize
@@ -23,8 +23,9 @@ def CreateLookUp():
 		helplist = LookUp[helper].split(',')	
 		LookUp[helper] = helplist[1:len(helplist)]
 	return
-
+#funkcija za prebrojavanje nula ili jedinica nad nizom
 def PopCount(Bitmap, boundary, cond):
+	#ideja je da iz liste prebrojava znakove i posprema u varijablu koju vraca
 	counter = 0
 	charachters = list(Bitmap)
 	
@@ -34,8 +35,10 @@ def PopCount(Bitmap, boundary, cond):
 			
 	return counter
 
+#funkcija koja stvara RRR strukturu nad bitmapom
 def CreateRRR(nodekey,preRRR):
 	
+	#funkcija koristi fiksne vrijednosti zbog brzeg izvodjenja
 	lenghtsize = len(preRRR) % 5
 	BlockSize = 5
 	SuperBlockSize = 4 * BlockSize
@@ -74,6 +77,7 @@ def CreateRRR(nodekey,preRRR):
 
 	stablo[nodekey] = instance
 	return 
+#klasa RRR koja predstavlja bitmape RRR strukture
 class RRR:
 	
 	def __init__(self):
@@ -81,33 +85,27 @@ class RRR:
 		self.SuperBlockSums = []
 		self.SuperBlockOffsets = []			
 
-def MakeBranch():
-	
-	left = []
-	right = []
-	return
-
+#funkcija koja rekurzivno stvara stablo valica iz ulaznog niza
 def InitTree(niz):
-		
+	#pronalazenje unikatnih znakova za abecedu	
 	words = re.findall('[A-Z]+', niz.upper())	
 	unique = list(set(''.join(words)))
 	
+	#pomocne vrijednosti za kljuc, pospremanje podataka i za lijevi i desni list koji nastaju
+	#pozivom rekurzije
 	key = {}
 	data = []
 	left = []
 	right = []
 	
-	
-		
-	#print unique
+	#odredimo koji znakovi primaju koju vrijednost te tako slozimo pomocni niz
 	limit = len(unique)/2	
 	for num in range (0,len(unique)):
 		if (num < limit): 
 			key[unique[num]] = '0'
 		else:
 			key[unique[num]] = '1'
-		#	print "a"
-		#print key
+		
 	for ch in list(words[0]):
 		data.append(key[ch])
 		if (key[ch] == '0'):
@@ -117,6 +115,10 @@ def InitTree(niz):
 	#print left
 	#print right
 	#print key
+	#provjeravamo je li ostao samo jedan znak i ako nije stvaramo novu podjelu 
+	#i idemo dalje u rekuzriju, u suprotnoom pospremamo znak 
+	#dodatne oznake su za stranu na koju pospremamo sto je ekvivalent nuli za desnu i
+	# jedinica za lijevu stranu te dodatno pospremamo na kojoj razini je podatak
 	if (len(unique) > 1):
 		stablo[counter[0]] = ''.join(data) +','+ counter[1] +','+ str(counter[2])
 		stablo[str(counter[1]) + str(counter[2])] = key 
@@ -152,43 +154,57 @@ def InitTree(niz):
 	return
 
 def rank(char, limit):
-	value = 0
-	#for char in 
+
+	unsorted = []
+	sortedlist = [] 
 	if (Rankhelper[0] == '0'):
 		keys = stablo['0']		
 		localkeys = {}		
 		where = keys[char]
-		value = PopCount(stablo[1],limit,int(where))
+		Rankhelper[2] = PopCount(stablo[1],limit,int(where))
 		Rankhelper[0] = str(int(Rankhelper[0])+1)
 		if (where == '0'):
 			Rankhelper[1] = 'L'
 		else:	
 			Rankhelper[1] = 'R'
-		rank(char,value)
+		rank(char,Rankhelper[2])
 	else:
 		for numeror in stablo.keys():
 			if (isinstance(numeror,int)):
+				unsorted.append(numeror)
+		print unsorted
+		unsorted.sort()
+		
+		for number in range(0,len(unsorted)):
+			numeror = unsorted[number]
+			if (isinstance(numeror,int)):
+			
 				splitted = stablo[numeror].split(',')
 				if((splitted[1] == Rankhelper[1]) and (splitted[2]==Rankhelper[0])):
-					localkeys = stablo[str(splitted[1])+str(int(splitted[2])+1)]
+					if any(str(splitted[0]) in s for s in uniqueKey):
+						break
+					localkeys = stablo[str(splitted[1])+str(splitted[2])]
 					print localkeys
 					where = localkeys[char]
 					
-					value = PopCount(stablo[numeror],limit,int(where))
-					Rankhelper[0] = str(int(Rankhelper[0])+1)
+					Rankhelper[2] = PopCount(stablo[numeror],limit,int(where))
+					#Rankhelper[0] = str(int(Rankhelper[0])+1)
 				
-	return value
+	return
 
+#main kod
+#citanje niza
+nizovi = [line.strip(' \t\n\r') for line in open(sys.argv[1])]
 
-file_object = open('niz.txt', 'r')
+niz = ''.join(nizovi)
 
-niz = file_object.read()
-
+#poziv funkcije za stvaranje LookUp tablica za RRR klase
 LookUp = {}
 CreateLookUp()
-#print LookUp
+
+#pomocne varijable
 counter = [1,'root',0]
-Rankhelper = ['0','']
+Rankhelper = ['0','',0]
 Selecthelper = ['0']
 
 uniqueKey = {}
@@ -202,16 +218,22 @@ for num in range (0,len(uniqueALL)):
 		uniqueKey[uniqueALL[num]] = '0'
 	else:
 		uniqueKey[uniqueALL[num]] = '1'
-#print uniqueKey
+
+#Ideja zapisa stabla valica je jedan kompleksan dictionary u kojem su zapisani s integer kljucevima
+#cvorovi stabla te s kljucevima koji su kombinacija razine i strane abecede za odredjenu razinu
+
 stablo = {}
 stablo['0'] = uniqueKey
 
+#poziv i inijcijalizacija stabla valica
 InitTree(niz)
 print stablo
-#brojejdinica = PopCount('010101010',4,'1')
-#print stablo
-#print brojejdinica
-rank('A',3)
+
+
+#stvaranje RRR strukture nad stablom valica
+rank(sys.argv[2],int(sys.argv[3]))
+print Rankhelper[2]
+Rankhelper[0] = '0'
 for numeror in stablo.keys():
 	if (isinstance(numeror,int)):
 		splitted = stablo[numeror].split(',')
@@ -219,11 +241,8 @@ for numeror in stablo.keys():
 			continue
 		else:
 			CreateRRR(numeror, ''.join(splitted[0]))
-
+			continue
+#print stablo
+#('T',10)
 #test = CreateRRR(30, '11101101110000010101111110000011111000000')
 
-#print stablo
-
-#print stablo
-#select i rank funkcije
-#rank ide odzgor, select od dolje
