@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	uint32_t result = 0;
 
 	if (argc != 5) {
-		printf ("Wrong number of parameters: \n./WavletTree filename rank_or_select[R or S] char bound \n");
+		cout <<"Wrong number of parameters: \n./WavletTree filename rank_or_select[R or S] char bound \n";
 		return -1;
     }
 
@@ -38,6 +38,12 @@ int main(int argc, char** argv)
 		gettimeofday(&start_time,NULL);
 		wt = WaveletTree::CreateTreeFromFASTAFile(filename);
 		gettimeofday(&end_time,NULL);
+
+		if (wt == NULL) {
+			cout <<"FAILED" <<endl;
+			cout <<"Could not open file " <<filename <<endl;
+			return 1;
+		}
 
 		us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
                        (1000000 * start_time.tv_sec + start_time.tv_usec));
@@ -55,7 +61,7 @@ int main(int argc, char** argv)
 			cout <<result <<" [" <<us <<" us]" <<endl;
 		}
 		else {
-			cout <<"Failed. Wrong index" <<endl;
+			cout <<"Failed. Wrong character or index" <<endl;
 		}
 	}
 	else if (rank_or_select == 'S') {
@@ -64,6 +70,12 @@ int main(int argc, char** argv)
 		gettimeofday(&start_time,NULL);
 		wt = WaveletTree::CreateTreeFromFASTAFile(filename);
 		gettimeofday(&end_time,NULL);
+
+		if (wt == NULL) {
+			cout <<"FAILED" <<endl;
+			cout <<"Could not open file " <<filename <<endl;
+			return 1;
+		}
 
 		us = (long)((1000000 * end_time.tv_sec + end_time.tv_usec) -
                        (1000000 * start_time.tv_sec + start_time.tv_usec));
@@ -82,7 +94,7 @@ int main(int argc, char** argv)
 			cout <<result <<" [" <<us <<" us]" <<endl;
 		}
 		else {
-			cout <<"Failed. Wrong index" <<endl;
+			cout <<"Failed. Wrong character or index" <<endl;
 		}
 	}
 	else {

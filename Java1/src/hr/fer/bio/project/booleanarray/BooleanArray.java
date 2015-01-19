@@ -6,7 +6,10 @@ import hr.fer.bio.project.wavelet.TreeNode;
 import java.util.Arrays;
 
 /**
- * Created by Branimir on 3.1.2015..
+ * Simple class for boolean[] encapsulation
+ *
+ * @author bpervan
+ * @since 1.0
  */
 public class BooleanArray implements Rankable {
 

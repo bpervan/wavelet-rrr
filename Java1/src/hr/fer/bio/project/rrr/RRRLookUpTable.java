@@ -12,10 +12,8 @@ import java.util.Map;
 public class RRRLookUpTable {
 
     /**
-     * Map<Class, Map<Offset, CumulativeRank>>
+     * Map<Class, Map<BooleanArray, Offset/Permutation>>
      * */
-    private Map<Integer, Map<Integer, BooleanArray>> table;
-
     private Map<Integer, Map<BooleanArray, Integer>> newTable;
 
     private RRRLookUpTable(){ }
@@ -31,8 +29,13 @@ public class RRRLookUpTable {
         return this.newTable;
     }
 
+    /** Singleton */
     private static RRRLookUpTable instance;
-
+    /**
+     * If RRR Look - up table is used as a singleton
+     *
+     * @return RRRLookUpTable
+     * */
     public static RRRLookUpTable getInstance(){
         if(instance == null){
             synchronized (RRRLookUpTable.class){
@@ -44,6 +47,11 @@ public class RRRLookUpTable {
         return instance;
     }
 
+    /**
+     * Helper method, used to generate RRR Look - up table
+     *
+     * @param length Length of an input string
+     * */
     public void generateTable(int length){
         //Temp map
         Map<BooleanArray, Integer> tempMap;
@@ -77,6 +85,11 @@ public class RRRLookUpTable {
 
     /**
      * Decode int to BooleanArray, with leading zeros
+     *
+     * @param toDecode Integer to decode
+     * @param num Number of digits
+     *
+     * @return BooleanArray representing decoded integer
      * */
     public static BooleanArray decodeInt(int toDecode, int num){
         BooleanArray retVal = new BooleanArray(num);
@@ -94,10 +107,23 @@ public class RRRLookUpTable {
         return retVal;
     }
 
+    /**
+     * Used for permutations, returns first permutation
+     *
+     * @param c Integer Seed
+     * @return Initial (first) permutation
+     * */
     public static int element0(int c){
         return (1 << c) - 1;
     }
 
+    /**
+     * Calculates binomial coefficient
+     *
+     * @param n
+     * @param k
+     * @return (n Cr k)
+    * */
     public static BigInteger binomial(int n, int k){
         BigInteger retVal = BigInteger.ONE;
         for(int i = 0; i < k; ++i){
@@ -106,12 +132,25 @@ public class RRRLookUpTable {
         return retVal;
     }
 
+    /**
+     * Calculates next permutation for seed v
+     *
+     * @param v seed
+     * @return Next (integer) permutation
+     * */
     public static int nextPermutation(int v){
         int t = (v | (v - 1)) + 1;
         int w = t | ((((t & -t) / (v & -v)) >> 1) - 1);
         return w;
     }
 
+    /**
+     * Calcualtes log(base 2)
+     *
+     * @param n Input integer
+     * @return Integer log(base 2)
+     * @throws java.lang.IllegalArgumentException
+     * */
     public static int log2(int n){
         if(n <= 0){
             throw new IllegalArgumentException();

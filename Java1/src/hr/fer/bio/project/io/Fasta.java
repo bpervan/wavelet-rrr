@@ -7,6 +7,9 @@ import java.io.IOException;
 
 /**
  * Created by Branimir on 13.11.2014..
+ *
+ * @author bpervan
+ * @since 1.0
  */
 public class Fasta {
     private String comment;
@@ -25,6 +28,14 @@ public class Fasta {
         return this.readings;
     }
 
+    /**
+     * Creates Fasta object from FASTA file given by fileName path
+     *
+     * @author Branimir
+     * @param fileName Path to FASTA file
+     * @throws java.io.IOException
+     * @return Fasta object representing read FASTA file
+     * */
     public static Fasta fromFile(String fileName) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(fileName)));
         StringBuilder stringBuilder = new StringBuilder();
